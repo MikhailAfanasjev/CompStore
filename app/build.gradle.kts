@@ -1,7 +1,10 @@
 plugins {
-    alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
+    id("com.android.application")
+    //alias(libs.plugins.android.application)
+    //alias(libs.plugins.kotlin.android)
+    id("org.jetbrains.kotlin.android")
     id("kotlin-kapt")
+    id("dagger.hilt.android.plugin")
 }
 
 android {
@@ -67,11 +70,13 @@ dependencies {
     implementation ("androidx.hilt:hilt-navigation-compose:1.0.0")
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.runtime.livedata)
-    implementation(libs.androidx.espresso.core) // Основная библиотека Room
+    implementation(libs.androidx.espresso.core)
+    implementation(libs.androidx.recyclerview) // Основная библиотека Room
     kapt(libs.androidx.room.compiler) // Компилятор Room для аннотаций
     implementation(libs.androidx.room.ktx) // KTX версия Room для удобства использования
     implementation("androidx.core:core-ktx:1.13.1")
     implementation ("androidx.navigation:navigation-compose:2.8.4")
+    implementation("androidx.work:work-runtime-ktx:2.8.1")
 
 
     // PdfRenderer
@@ -79,6 +84,9 @@ dependencies {
     // https://github.com/TomRoush/PdfBox-Android
     implementation("com.tom-roush:pdfbox-android:2.0.27.0")
     //  implementation("com.gemalto.jp2:jp2-android:1.0.3")
+
+    implementation("com.google.dagger:hilt-android:2.52")
+    kapt("com.google.dagger:hilt-compiler:2.52")
 
     // Gson
     implementation ("com.google.code.gson:gson:2.8.8")

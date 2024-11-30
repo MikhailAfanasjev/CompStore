@@ -1,8 +1,8 @@
-//package com.example.fishstore.di
+//package com.example.compstore.di
 //
 //import android.content.Context
 //import androidx.work.WorkerParameters
-//import com.example.fishstore.worker.StoreRememberWorker
+//import com.example.compstore.worker.StoreRememberWorker
 //import dagger.Module
 //import dagger.Provides
 //import dagger.hilt.InstallIn
