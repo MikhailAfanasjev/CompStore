@@ -1,18 +1,12 @@
 package com.example.compstore.worker
 
-import android.app.NotificationChannel
-import android.app.NotificationManager
 import android.content.Context
 import android.content.pm.PackageManager
-import android.media.AudioAttributes
-import android.net.Uri
 import android.os.Build
+import android.util.Log
 import androidx.core.app.ActivityCompat
-import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
 import androidx.work.Worker
 import androidx.work.WorkerParameters
-import com.example.linguareader.R
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
@@ -22,73 +16,40 @@ class StoreRememberWorker @Inject constructor(
 ) : Worker(context, workerParams) {
 
     override fun doWork(): Result {
-        // Извлекаем имя задачи из переданных данных
         val taskName = inputData.getString("task_name") ?: return Result.failure()
 
-        // Отправка уведомления пользователю
+        Log.d("StoreRememberWorker", "Received task name: $taskName")
+
         return try {
             if (checkNotificationPermission()) {
                 showNotification(taskName)
+                Log.d("StoreRememberWorker", "Notification shown successfully for task: $taskName")
                 Result.success()
             } else {
-                // Логгируем, что уведомление не было показано из-за отсутствия разрешений
+                Log.w("StoreRememberWorker", "Notification permission denied.")
                 Result.failure()
             }
         } catch (e: Exception) {
-            e.printStackTrace()
+            Log.e("StoreRememberWorker", "Error showing notification: ${e.message}", e)
             Result.failure()
         }
     }
 
     private fun checkNotificationPermission(): Boolean {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            // Для Android 13 (API 33) и выше, нужно проверить разрешение на уведомления
+        val hasPermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             ActivityCompat.checkSelfPermission(context, android.Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED
         } else {
-            // Для версий ниже Android 13 разрешение не требуется
             true
         }
+        Log.d("StoreRememberWorker", "Notification permission status: $hasPermission")
+        return hasPermission
     }
 
     private fun showNotification(taskName: String) {
-        // Создаем URI для пользовательского звука из папки res/raw
-        //val soundUri: Uri = Uri.parse("android.resource://${context.packageName}/${R.raw.custom_sound}")
+        Log.d("StoreRememberWorker", "Preparing to show notification for task: $taskName")
 
-        // Настройка AudioAttributes для управления поведением звука
-        val audioAttributes = AudioAttributes.Builder()
-            .setUsage(AudioAttributes.USAGE_NOTIFICATION) // Используется для уведомлений
-            .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION) // Звук уведомлений
-            .build()
+        // Rest of the notification code...
 
-        // Создание канала для уведомлений (для API >= 26)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                "task_reminder_channel",
-                "Task Reminders",
-                NotificationManager.IMPORTANCE_HIGH
-            ).apply {
-                description = "Channel for task reminders"
-                //setSound(soundUri, audioAttributes) // Устанавливаем звук
-            }
-
-            val notificationManager: NotificationManager =
-                context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            notificationManager.createNotificationChannel(channel)
-        }
-
-        // Создание и отправка уведомления
-        val notification = NotificationCompat.Builder(context, "task_reminder_channel")
-            //.setSmallIcon(R.drawable.ic_notification) // Иконка уведомления
-            .setContentTitle("Напоминание о задаче")
-            .setContentText("Не забудьте: $taskName")
-            .setPriority(NotificationCompat.PRIORITY_HIGH)
-            //.setSound(soundUri) // Устанавливаем звук для уведомления
-            .setAutoCancel(true)
-            .build()
-
-        // Проверяем разрешение перед отправкой уведомления
-        if (NotificationManagerCompat.from(context).areNotificationsEnabled()) {
-            NotificationManagerCompat.from(context).notify(1, notification)
-        }
+        Log.d("StoreRememberWorker", "Notification setup completed.")
     }
 }

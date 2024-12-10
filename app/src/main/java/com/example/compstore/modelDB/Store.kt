@@ -1,5 +1,6 @@
-package com.example.compstore.db
+package com.example.compstore.modelDB
 
+import android.util.Log
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
@@ -10,4 +11,8 @@ data class Store(
     val name: String,
     val telephoneNumber: String,
     val email: String
-)
+) {
+    init {
+        Log.d("Store", "Store entity created: $this")
+    }
+}
