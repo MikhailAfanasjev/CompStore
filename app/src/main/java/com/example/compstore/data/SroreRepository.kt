@@ -1,23 +1,23 @@
 package com.example.compstore.data
 
-import android.util.Log
-import com.example.compstore.modelDB.Store
-import com.example.compstore.dao.StoreDao
+import com.example.compstore.modelDB.User
+import com.example.compstore.dao.UserDao
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class StoreRepository @Inject constructor(private val storeDao: StoreDao) {
-    suspend fun insertStore(store: Store) {
-        Log.d("StoreRepository", "Inserting store: $store")
-        storeDao.insertStore(store)
-        Log.d("StoreRepository", "Store inserted successfully: $store")
+class StoreRepository @Inject constructor(private val userDao: UserDao) {
+
+    fun getUserDataFlow(): Flow<User?> {
+        return userDao.getUserData()
     }
-    suspend fun getStore(): Store? {
-        return storeDao.getStore()
+
+    suspend fun insertUserData(user: User) {
+        userDao.insertUserData(user)
     }
 
     suspend fun hasStores(): Boolean {
-        return storeDao.getStoreCount() > 0
+        return userDao.getStoreCount() > 0
     }
 }

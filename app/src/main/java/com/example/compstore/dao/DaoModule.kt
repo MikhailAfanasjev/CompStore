@@ -16,8 +16,8 @@ object DaoModule {
 
     @Provides
     @Singleton
-    fun provideStoreDao(@ApplicationContext appContext: Context): StoreDao {
-        Log.d("DaoModule", "Providing StoreDao instance")
+    fun provideStoreDao(@ApplicationContext appContext: Context): UserDao {
+        Log.d("DaoModule", "Providing UserDao instance")
         return StoreDatabase.getDatabase(appContext).storeDAO()
     }
 }

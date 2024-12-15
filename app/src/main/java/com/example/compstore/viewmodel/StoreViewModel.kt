@@ -1,56 +1,39 @@
 package com.example.compstore.viewmodel
 
-import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.compstore.modelDB.Store
 import com.example.compstore.data.StoreRepository
+import com.example.compstore.modelDB.User
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+
 @HiltViewModel
-class StoreViewModel @Inject constructor(
-    private val repository: StoreRepository
-) : ViewModel() {
+class StoreViewModel @Inject constructor(private val repository: StoreRepository) : ViewModel() {
 
-    private val _store = MutableLiveData<Store?>()
-    val store: LiveData<Store?> get() = _store
+    val user: StateFlow<User?> = repository.getUserDataFlow()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = null
+        )
 
-    fun saveStore(address: String, name: String, phone: String, email: String) {
-        Log.d("StoreViewModel", "Preparing to save store details.")
-        val store = Store(
-            address = address,
+    fun saveStore(name: String, phone: String, email: String, password: String) {
+        val updatedUser = User(
             name = name,
             telephoneNumber = phone,
-            email = email
+            email = email,
+            password = password
         )
-        Log.d("StoreViewModel", "Store object created: $store")
         viewModelScope.launch {
-            try {
-                repository.insertStore(store)
-                Log.d("StoreViewModel", "Store saved successfully.")
-            } catch (e: Exception) {
-                Log.e("StoreViewModel", "Error saving store: ${e.message}", e)
-            }
+            repository.insertUserData(updatedUser)
         }
     }
-
-    fun checkIfStoresExist(onResult: (Boolean) -> Unit) {
-        viewModelScope.launch {
-            val hasStores = repository.hasStores()
-            onResult(hasStores)
-        }
-    }
-
-    fun getStore() {
-        viewModelScope.launch {
-            viewModelScope.launch {
-                val fetchedStore = repository.getStore()
-                _store.postValue(fetchedStore)
-            }
-        }
+    suspend fun hasUserData(): Boolean {
+        return repository.hasStores()
     }
 }

@@ -4,12 +4,12 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.example.compstore.dao.StoreDao
-import com.example.compstore.modelDB.Store
+import com.example.compstore.dao.UserDao
+import com.example.compstore.modelDB.User
 
-@Database(entities = [Store::class], version = 1)
+@Database(entities = [User::class], version = 1)
 abstract class StoreDatabase : RoomDatabase() {
-    abstract fun storeDAO(): StoreDao
+    abstract fun storeDAO(): UserDao
 
     companion object {
         @Volatile
