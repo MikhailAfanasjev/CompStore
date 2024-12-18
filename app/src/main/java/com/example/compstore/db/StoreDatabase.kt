@@ -15,7 +15,7 @@ abstract class StoreDatabase : RoomDatabase() {
         @Volatile
         private var INSTANCE: StoreDatabase? = null
 
-        fun getDatabase(context: Context): StoreDatabase { // Получаем экземпляр базы данных
+        fun getDatabase(context: Context): StoreDatabase {
             return INSTANCE ?: synchronized(this) {
                 val instance = Room.databaseBuilder(
                     context.applicationContext,

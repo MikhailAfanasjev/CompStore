@@ -26,16 +26,15 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.example.compstore.data.StoreRepository
 import com.example.compstore.modelDB.User
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import com.example.compstore.viewmodel.StoreViewModel
 
 @Composable
 fun RegistrationScreen(
-    navController: NavController
+    navController: NavController,
+    storeViewModel: StoreViewModel = hiltViewModel()
 ) {
     var name by remember { mutableStateOf("") }
     var phone by remember { mutableStateOf("") }
@@ -62,10 +61,7 @@ fun RegistrationScreen(
 
             TextField(
                 value = name,
-                onValueChange = {
-                    name = it
-                    Log.d("RegistrationScreen", "Name changed: $it")
-                },
+                onValueChange = { name = it },
                 label = { Text("ФИО") },
                 modifier = Modifier.fillMaxWidth()
             )
@@ -73,10 +69,7 @@ fun RegistrationScreen(
 
             TextField(
                 value = phone,
-                onValueChange = {
-                    phone = it
-                    Log.d("RegistrationScreen", "Phone changed: $it")
-                },
+                onValueChange = { phone = it },
                 label = { Text("Телефон") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                 modifier = Modifier.fillMaxWidth()
@@ -85,10 +78,7 @@ fun RegistrationScreen(
 
             TextField(
                 value = email,
-                onValueChange = {
-                    email = it
-                    Log.d("RegistrationScreen", "Email changed: $it")
-                },
+                onValueChange = { email = it },
                 label = { Text("Email") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                 modifier = Modifier.fillMaxWidth()
@@ -97,10 +87,7 @@ fun RegistrationScreen(
 
             TextField(
                 value = password,
-                onValueChange = {
-                    password = it
-                    Log.d("RegistrationScreen", "Password changed: ${if (it.isNotEmpty()) "****" else ""}")
-                },
+                onValueChange = { password = it },
                 label = { Text("Пароль") },
                 visualTransformation = PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
@@ -111,17 +98,15 @@ fun RegistrationScreen(
             Button(
                 onClick = {
                     if (name.isNotEmpty() && phone.isNotEmpty() && email.isNotEmpty() && password.isNotEmpty()) {
-                        val user = User(
-                            name = name,
-                            telephoneNumber = phone,
-                            email = email,
-                            password = password
-                        )
-                        Log.d("RegistrationScreen", "User registered: $user")
+                        // Сохранение данных пользователя в StoreViewModel
+                        storeViewModel.saveUser(name, phone, email, password)
                         Toast.makeText(context, "Регистрация успешна", Toast.LENGTH_SHORT).show()
-                        navController.navigate("login")
+
+                        // Переход на ProfileScreen
+                        navController.navigate("profile") {
+                            popUpTo("registration") { inclusive = true }
+                        }
                     } else {
-                        Log.w("RegistrationScreen", "Fields are empty")
                         Toast.makeText(context, "Заполните все поля", Toast.LENGTH_SHORT).show()
                     }
                 },

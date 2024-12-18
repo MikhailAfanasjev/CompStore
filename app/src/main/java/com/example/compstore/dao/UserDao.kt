@@ -19,6 +19,6 @@ interface UserDao {
     @Query("SELECT COUNT(*) FROM user")
     suspend fun getStoreCount(): Int
 
-    @Query("SELECT COUNT(*) FROM user WHERE name = :login AND password = :password")
-    suspend fun validateUser(login: String, password: String): Int
+    @Query("DELETE FROM user")
+    suspend fun clearUserData()
 }

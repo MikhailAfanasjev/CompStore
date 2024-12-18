@@ -92,7 +92,7 @@ fun EditScreen(
             Button(
                 onClick = {
                     Log.d("EditScreen", "Save button clicked")
-                    storeViewModel.saveStore(
+                    storeViewModel.saveUser(
                         name = nameState.value,
                         phone = phoneState.value,
                         email = emailState.value,

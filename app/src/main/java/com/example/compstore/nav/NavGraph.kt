@@ -136,7 +136,7 @@ fun NavGraph() {
                 LoginScreen(navController = navController)
             }
             composable("profile") {
-                ProfileScreen(navController)
+                ProfileScreen(navController = navController)
             }
             composable("registration") {
                 RegistrationScreen(navController)

@@ -22,7 +22,7 @@ class StoreViewModel @Inject constructor(private val repository: StoreRepository
             initialValue = null
         )
 
-    fun saveStore(name: String, phone: String, email: String, password: String) {
+    fun saveUser(name: String, phone: String, email: String, password: String) {
         val updatedUser = User(
             name = name,
             telephoneNumber = phone,
@@ -35,5 +35,17 @@ class StoreViewModel @Inject constructor(private val repository: StoreRepository
     }
     suspend fun hasUserData(): Boolean {
         return repository.hasStores()
+    }
+    fun logoutUser() {
+        viewModelScope.launch {
+            repository.clearUserData()
+        }
+    }
+    fun saveUserAddress(city: String, street: String, house: String, apartment: String) {
+        viewModelScope.launch {
+            // Пример добавления адреса в базу данных (будем использовать соответствующую сущность в репозитории)
+            val newAddress = Address(city = city, street = street, house = house, apartment = apartment)
+            repository.saveAddress(newAddress)
+        }
     }
 }

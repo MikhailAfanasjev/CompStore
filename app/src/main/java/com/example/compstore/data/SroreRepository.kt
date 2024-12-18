@@ -20,4 +20,7 @@ class StoreRepository @Inject constructor(private val userDao: UserDao) {
     suspend fun hasStores(): Boolean {
         return userDao.getStoreCount() > 0
     }
+    suspend fun clearUserData() {
+        userDao.clearUserData()
+    }
 }
