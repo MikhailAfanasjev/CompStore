@@ -1,8 +1,6 @@
 package com.example.compstore.nav
 
 import android.util.Log
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
@@ -36,7 +34,8 @@ import com.example.compstore.screen.profile.EditScreen
 import com.example.compstore.screen.profile.LoginScreen
 import com.example.compstore.screen.profile.ProfileScreen
 import com.example.compstore.screen.profile.RegistrationScreen
-import com.example.compstore.viewmodel.StoreViewModel
+import com.example.compstore.viewmodel.AddressViewModel
+import com.example.compstore.viewmodel.UserViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -47,8 +46,8 @@ fun NavGraph() {
     val navController = rememberNavController()
     val screensWithButtonBar = listOf("home", "basket", "chat", "settings", "profile")
     val screensWithoutTopAppBar = listOf("welcome", "basket")
-    val storeViewModel: StoreViewModel = hiltViewModel()
-
+    val addressViewModel: AddressViewModel = hiltViewModel()
+    val userViewModel: UserViewModel = hiltViewModel()
     Scaffold(
         topBar = {
             val currentDestination by navController.currentBackStackEntryAsState()
@@ -61,7 +60,7 @@ fun NavGraph() {
                         IconButton(
                             onClick = {
                                 CoroutineScope(Dispatchers.Main).launch {
-                                    val hasUser = storeViewModel.hasUserData()
+                                    val hasUser = userViewModel.hasUserData()
                                     val currentRoute = navController.currentBackStackEntry?.destination?.route
 
                                     Log.d("NavGraph", "Navigating from $currentRoute")
@@ -145,7 +144,7 @@ fun NavGraph() {
                 EditScreen(navController)
             }
             composable("editAddress") {
-                EditAddressScreen()
+                EditAddressScreen(navController)
             }
             // composable("editHistory") { EditHistoryScreen() }
             // composable("editPaymentMethod") { EditPaymentMethodScreen() }

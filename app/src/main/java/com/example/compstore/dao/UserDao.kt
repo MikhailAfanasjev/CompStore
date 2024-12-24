@@ -1,9 +1,11 @@
 package com.example.compstore.dao
 
+import android.util.Log
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Update
 import com.example.compstore.modelDB.User
 import kotlinx.coroutines.flow.Flow
 
@@ -21,4 +23,7 @@ interface UserDao {
 
     @Query("DELETE FROM user")
     suspend fun clearUserData()
+
+    @Update
+    suspend fun updateUserData(user: User)
 }

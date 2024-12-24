@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -18,25 +17,27 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.example.compstore.viewmodel.StoreViewModel
+import com.example.compstore.viewmodel.AddressViewModel
+import com.example.compstore.viewmodel.UserViewModel
 
 @Composable
 fun ProfileScreen(
     navController: NavController,
-    storeViewModel: StoreViewModel = hiltViewModel()
+    storeViewModel: AddressViewModel = hiltViewModel(),
+    userViewModel: UserViewModel = hiltViewModel()
 ) {
-    val user by storeViewModel.user.collectAsState()
+    val user by userViewModel.user.collectAsState()
+    val address by storeViewModel.userAddress.collectAsState(initial = null)
 
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
     ) {
         if (user == null) {
-            // Показ загрузочного сообщения, если данные пользователя отсутствуют
+            Log.d("ProfileScreen", "User data is loading...")
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -50,6 +51,9 @@ fun ProfileScreen(
                 )
             }
         } else {
+            Log.d("ProfileScreen", "User data loaded: $user")
+            Log.d("ProfileScreen", "Address data loaded: $address")
+
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -57,6 +61,7 @@ fun ProfileScreen(
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.Start
             ) {
+                // User
                 Text(
                     text = "ФИО: ${user?.name ?: "Не указано"}",
                     style = MaterialTheme.typography.bodyMedium
@@ -77,17 +82,7 @@ fun ProfileScreen(
 
                 Button(
                     onClick = {
-                        navController.navigate("edit")
-                    }
-                ) {
-                    Text("Редактировать профиль")
-                }
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Button(
-                    onClick = {
-                        Log.d("ProfileScreen", "Navigate to edit screen")
+                        Log.d("ProfileScreen", "Navigating to Edit Screen")
                         navController.navigate("edit")
                     },
                     modifier = Modifier.fillMaxWidth()
@@ -97,22 +92,19 @@ fun ProfileScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                //Адрес
+                // Address
                 Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalArrangement = Arrangement.Top,
-                    horizontalAlignment = Alignment.Start
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    Log.d("ProfileScreen", "History section clicked, user name: ${user?.name ?: "No name"}")
                     Text(
-                        text = "Адрес: ${user?.name ?: "Не указано"}",
+                        text = "Адрес: ${address?.let { "${it.city}, ${it.street}, ${it.house}, ${it.apartment}" } ?: "Не указано"}",
                         style = MaterialTheme.typography.bodyMedium
                     )
                     Spacer(modifier = Modifier.height(4.dp))
 
                     Button(
                         onClick = {
-                            Log.d("ProfileScreen", "Navigate to edit address screen")
+                            Log.d("ProfileScreen", "Navigating to Edit Address Screen")
                             navController.navigate("editAddress")
                         },
                         modifier = Modifier.fillMaxWidth()
@@ -123,13 +115,11 @@ fun ProfileScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // История заказов
+                // History
                 Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalArrangement = Arrangement.Top,
-                    horizontalAlignment = Alignment.Start
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    Log.d("ProfileScreen", "History section clicked, user name: ${user?.name ?: "No name"}")
+                    Log.d("ProfileScreen", "Opening Order History Section")
                     Text(
                         text = "История заказов: ${user?.name ?: "Не указано"}",
                         style = MaterialTheme.typography.bodyMedium
@@ -138,7 +128,7 @@ fun ProfileScreen(
 
                     Button(
                         onClick = {
-                            Log.d("ProfileScreen", "Navigate to edit history screen")
+                            Log.d("ProfileScreen", "Navigating to Edit History Screen")
                             navController.navigate("editHistory")
                         },
                         modifier = Modifier.fillMaxWidth()
@@ -149,13 +139,11 @@ fun ProfileScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Способ оплаты
+                // Payment Method
                 Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalArrangement = Arrangement.Top,
-                    horizontalAlignment = Alignment.Start
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    Log.d("ProfileScreen", "Payment method section clicked")
+                    Log.d("ProfileScreen", "Opening Payment Method Section")
                     Text(
                         text = "Способ оплаты: ${user?.name ?: "Не указано"}",
                         style = MaterialTheme.typography.bodyMedium
@@ -164,7 +152,7 @@ fun ProfileScreen(
 
                     Button(
                         onClick = {
-                            Log.d("ProfileScreen", "Navigate to edit payment method screen")
+                            Log.d("ProfileScreen", "Navigating to Edit Payment Method Screen")
                             navController.navigate("editPaymentMethod")
                         },
                         modifier = Modifier.fillMaxWidth()
@@ -175,22 +163,20 @@ fun ProfileScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Смена пароля
+                // Password
                 Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalArrangement = Arrangement.Top,
-                    horizontalAlignment = Alignment.Start
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    Log.d("ProfileScreen", "Password change section clicked")
+                    Log.d("ProfileScreen", "Opening Password Change Section")
                     Text(
-                        text = "Сменить пароль: ${user?.name ?: "Не указано"}",
+                        text = "Сменить пароль",
                         style = MaterialTheme.typography.bodyMedium
                     )
                     Spacer(modifier = Modifier.height(4.dp))
 
                     Button(
                         onClick = {
-                            Log.d("ProfileScreen", "Navigate to edit password screen")
+                            Log.d("ProfileScreen", "Navigating to Edit Password Screen")
                             navController.navigate("editPassword")
                         },
                         modifier = Modifier.fillMaxWidth()
@@ -199,10 +185,13 @@ fun ProfileScreen(
                     }
                 }
 
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Logout Button
                 Button(
                     onClick = {
-                        // Логика выхода из аккаунта
-                        storeViewModel.logoutUser()
+                        Log.d("ProfileScreen", "Logging out user")
+                        userViewModel.logoutUser()
                         navController.navigate("login") {
                             popUpTo("profile") { inclusive = true }
                         }

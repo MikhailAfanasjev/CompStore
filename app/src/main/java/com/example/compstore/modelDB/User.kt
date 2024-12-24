@@ -1,6 +1,5 @@
 package com.example.compstore.modelDB
 
-import android.util.Log
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 

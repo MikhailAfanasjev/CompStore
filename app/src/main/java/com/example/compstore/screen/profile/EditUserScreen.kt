@@ -16,6 +16,8 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -24,22 +26,28 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.compstore.viewmodel.UserViewModel
-
 @Composable
-fun RegistrationScreen(
+fun EditScreen(
     navController: NavController,
     userViewModel: UserViewModel = hiltViewModel()
 ) {
     var name by remember { mutableStateOf("") }
     var phone by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
     val context = LocalContext.current
+
+    val store by userViewModel.user.collectAsState()
+    LaunchedEffect(store) {
+        store?.let {
+            name = it.name ?: ""
+            phone = it.telephoneNumber ?: ""
+            email = it.email ?: ""
+        }
+    }
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -49,11 +57,11 @@ fun RegistrationScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(16.dp),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
+            verticalArrangement = Arrangement.Top,
+            horizontalAlignment = Alignment.Start
         ) {
             Text(
-                text = "Регистрация",
+                text = "Редактировать данные",
                 style = MaterialTheme.typography.headlineMedium,
                 modifier = Modifier.padding(bottom = 16.dp)
             )
@@ -62,7 +70,7 @@ fun RegistrationScreen(
                 value = name,
                 onValueChange = {
                     name = it
-                    Log.d("RegistrationScreen", "Name input updated: $name")
+                    Log.d("EditScreen", "Name input updated: $name")
                 },
                 label = { Text("ФИО") },
                 modifier = Modifier.fillMaxWidth()
@@ -73,7 +81,7 @@ fun RegistrationScreen(
                 value = phone,
                 onValueChange = {
                     phone = it
-                    Log.d("RegistrationScreen", "Phone input updated: $phone")
+                    Log.d("EditScreen", "Phone input updated: $phone")
                 },
                 label = { Text("Телефон") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
@@ -85,60 +93,50 @@ fun RegistrationScreen(
                 value = email,
                 onValueChange = {
                     email = it
-                    Log.d("RegistrationScreen", "Email input updated: $email")
+                    Log.d("EditScreen", "Email input updated: $email")
                 },
                 label = { Text("Email") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                modifier = Modifier.fillMaxWidth()
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-
-            TextField(
-                value = password,
-                onValueChange = {
-                    password = it
-                    Log.d("RegistrationScreen", "Password input updated")
-                },
-                label = { Text("Пароль") },
-                visualTransformation = PasswordVisualTransformation(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                 modifier = Modifier.fillMaxWidth()
             )
             Spacer(modifier = Modifier.height(16.dp))
 
             Button(
                 onClick = {
-                    Log.d("RegistrationScreen", "Register button clicked")
+                    Log.d("EditScreen", "Save button clicked")
                     if (name.isNotEmpty() &&
                         phone.isNotEmpty() &&
-                        email.isNotEmpty() &&
-                        password.isNotEmpty()) {
+                        email.isNotEmpty()
+                    ) {
                         Log.d(
-                            "RegistrationScreen",
-                            "All fields are filled"
+                            "EditScreen",
+                            "Saving user: name=$name, phone=$phone, email=$email"
                         )
-                        userViewModel.saveUser(
-                            name,
-                            phone,
-                            email,
-                            password
-                        )
-                        Log.d("RegistrationScreen", "User saved successfully: name=$name, phone=$phone, email=$email")
 
-                        Toast.makeText(context, "Регистрация успешна", Toast.LENGTH_SHORT).show()
+                        store?.let {
+                            userViewModel.updateUser(
+                                it.id,
+                                name,
+                                phone,
+                                email,
+                                it.password.orEmpty()
+                            )
+                        }
+
+                        Log.d("EditUserScreen", "User updated successfully: name=$name, phone=$phone, email=$email")
+                        Toast.makeText(context, "Данные успешно обновлены", Toast.LENGTH_SHORT).show()
 
                         navController.navigate("profile") {
                             popUpTo("registration") { inclusive = true }
                         }
-                        Log.d("RegistrationScreen", "Navigated to 'profile' screen")
                     } else {
-                        Log.w("RegistrationScreen", "Validation failed: some fields are empty")
+                        Log.w("EditScreen", "Validation failed: some fields are empty")
                         Toast.makeText(context, "Заполните все поля", Toast.LENGTH_SHORT).show()
                     }
                 },
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Зарегистрироваться")
+                Text("Сохранить")
             }
         }
     }

@@ -4,12 +4,15 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import com.example.compstore.dao.AddressDao
 import com.example.compstore.dao.UserDao
 import com.example.compstore.modelDB.User
+import com.example.compstore.modelDB.Address
 
-@Database(entities = [User::class], version = 1)
+@Database(entities = [User::class, Address::class], version = 1)
 abstract class StoreDatabase : RoomDatabase() {
-    abstract fun storeDAO(): UserDao
+    abstract fun userDAO(): UserDao
+    abstract fun addressDAO(): AddressDao
 
     companion object {
         @Volatile
@@ -21,7 +24,9 @@ abstract class StoreDatabase : RoomDatabase() {
                     context.applicationContext,
                     StoreDatabase::class.java,
                     "storeNote"
-                ).build()
+                )
+                    //.fallbackToDestructiveMigration()
+                    .build()
                 INSTANCE = instance
                 instance
             }
