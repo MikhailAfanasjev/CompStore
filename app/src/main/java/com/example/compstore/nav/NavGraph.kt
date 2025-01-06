@@ -30,7 +30,9 @@ import com.example.compstore.screen.HomeScreen
 import com.example.compstore.screen.SettingsScreen
 import com.example.compstore.screen.WelcomeScreen
 import com.example.compstore.screen.profile.EditAddressScreen
-import com.example.compstore.screen.profile.EditScreen
+import com.example.compstore.screen.profile.EditPasswordScreen
+import com.example.compstore.screen.profile.EditPaymentMethodScreen
+import com.example.compstore.screen.profile.EditUserScreen
 import com.example.compstore.screen.profile.LoginScreen
 import com.example.compstore.screen.profile.ProfileScreen
 import com.example.compstore.screen.profile.RegistrationScreen
@@ -141,14 +143,16 @@ fun NavGraph() {
                 RegistrationScreen(navController)
             }
             composable("edit") {
-                EditScreen(navController)
+                EditUserScreen(navController)
             }
             composable("editAddress") {
                 EditAddressScreen(navController)
             }
             // composable("editHistory") { EditHistoryScreen() }
-            // composable("editPaymentMethod") { EditPaymentMethodScreen() }
-            // composable("editPassword") { EditPasswordScreen() }
+             composable("editPaymentMethod") { EditPaymentMethodScreen(navController) }
+
+            composable("editPassword") {
+                EditPasswordScreen(navController) }
         }
     }
 }

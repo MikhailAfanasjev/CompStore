@@ -30,7 +30,8 @@ fun ProfileScreen(
     userViewModel: UserViewModel = hiltViewModel()
 ) {
     val user by userViewModel.user.collectAsState()
-    val address by storeViewModel.userAddress.collectAsState(initial = null)
+    val userAddresses by storeViewModel.userAddresses.collectAsState()
+    val paymentMethod by userViewModel.paymentMethod.collectAsState()
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -52,7 +53,7 @@ fun ProfileScreen(
             }
         } else {
             Log.d("ProfileScreen", "User data loaded: $user")
-            Log.d("ProfileScreen", "Address data loaded: $address")
+            Log.d("ProfileScreen", "Address data loaded: $userAddresses")
 
             Column(
                 modifier = Modifier
@@ -96,10 +97,20 @@ fun ProfileScreen(
                 Column(
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(
-                        text = "Адрес: ${address?.let { "${it.city}, ${it.street}, ${it.house}, ${it.apartment}" } ?: "Не указано"}",
-                        style = MaterialTheme.typography.bodyMedium
-                    )
+                    if (userAddresses.isEmpty()) {
+                        Text(
+                            text = "Адрес не указан",
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    } else {
+                        userAddresses.forEach { address ->
+                            Text(
+                                text = "${address.city}, ${address.street}, ${address.house}, ${address.apartment}",
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+                        }
+                    }
                     Spacer(modifier = Modifier.height(4.dp))
 
                     Button(
@@ -143,16 +154,13 @@ fun ProfileScreen(
                 Column(
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Log.d("ProfileScreen", "Opening Payment Method Section")
                     Text(
-                        text = "Способ оплаты: ${user?.name ?: "Не указано"}",
+                        text = "Способ оплаты: $paymentMethod",
                         style = MaterialTheme.typography.bodyMedium
                     )
                     Spacer(modifier = Modifier.height(4.dp))
-
                     Button(
                         onClick = {
-                            Log.d("ProfileScreen", "Navigating to Edit Payment Method Screen")
                             navController.navigate("editPaymentMethod")
                         },
                         modifier = Modifier.fillMaxWidth()
@@ -168,12 +176,6 @@ fun ProfileScreen(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Log.d("ProfileScreen", "Opening Password Change Section")
-                    Text(
-                        text = "Сменить пароль",
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                    Spacer(modifier = Modifier.height(4.dp))
-
                     Button(
                         onClick = {
                             Log.d("ProfileScreen", "Navigating to Edit Password Screen")
@@ -181,7 +183,7 @@ fun ProfileScreen(
                         },
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Text("Редактировать")
+                        Text("Сменить пароль")
                     }
                 }
 

@@ -4,7 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.compstore.modelDB.User
-import com.example.compstore.repository.StoreRepository
+import com.example.compstore.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -15,7 +15,10 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class UserViewModel @Inject constructor(private val repository: StoreRepository) : ViewModel() {
+class UserViewModel @Inject constructor(private val repository: UserRepository) : ViewModel() {
+
+    private val _paymentMethod = MutableStateFlow("Не выбран")
+    val paymentMethod: StateFlow<String> = _paymentMethod
 
     val user: StateFlow<User?> = repository.getUserDataFlow()
         .stateIn(
@@ -71,10 +74,10 @@ class UserViewModel @Inject constructor(private val repository: StoreRepository)
         Log.d("StoreViewModelAddress", "Logging out user")
         viewModelScope.launch {
             try {
-                repository.clearUserData()
-                Log.d("StoreViewModelAddress", "User data cleared successfully")
+                (user as MutableStateFlow).emit(null)
+                Log.d("StoreViewModelAddress", "User state reset successfully")
             } catch (e: Exception) {
-                Log.e("StoreViewModelAddress", "Error clearing user data: ${e.message}", e)
+                Log.e("StoreViewModelAddress", "Error logging out user: ${e.message}", e)
             }
         }
     }
@@ -89,5 +92,9 @@ class UserViewModel @Inject constructor(private val repository: StoreRepository)
             Log.e("StoreViewModelAddress", "Error checking user data: ${e.message}", e)
             false
         }
+    }
+    fun updatePaymentMethod(method: String) {
+        _paymentMethod.value = method
+        Log.d("UserViewModel", "Payment method updated: $method")
     }
 }

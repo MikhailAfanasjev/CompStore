@@ -21,8 +21,8 @@ interface UserDao {
     @Query("SELECT COUNT(*) FROM user")
     suspend fun getStoreCount(): Int
 
-    @Query("DELETE FROM user")
-    suspend fun clearUserData()
+//    @Query("DELETE FROM user")
+//    suspend fun clearUserData()
 
     @Update
     suspend fun updateUserData(user: User)

@@ -14,18 +14,14 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AddressViewModel @Inject constructor(private val repository: AddressRepository) : ViewModel() {
-
-    val userAddress: StateFlow<Address?> = repository.getUserAddressFlow()
+    val userAddresses: StateFlow<List<Address>> = repository.getUserAddressesFlow()
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
-            initialValue = null
-        ).also {
-            Log.d("StoreViewModelAddress", "User address state flow initialized")
-        }
+            initialValue = emptyList()
+        )
 
     fun saveUserAddress(city: String, street: String, house: String, apartment: String) {
-        Log.d("StoreViewModelAddress", "Saving user address: city=$city, street=$street, house=$house, apartment=$apartment")
         viewModelScope.launch {
             try {
                 val newAddress = Address(
@@ -34,11 +30,35 @@ class AddressViewModel @Inject constructor(private val repository: AddressReposi
                     house = house,
                     apartment = apartment
                 )
-                repository.saveAddress(newAddress)
-                Log.d("StoreViewModelAddress", "User address saved successfully")
+                repository.insertAddress(newAddress)
             } catch (e: Exception) {
-                Log.e("StoreViewModelAddress", "Error saving user address: ${e.message}", e)
+                Log.e("StoreViewModelAddress", "Error saving address: ${e.message}", e)
             }
+        }
+    }
+
+    fun updateAddress(id: Int, city: String, street: String, house: String, apartment: String) {
+        val updatedAddress = Address(
+            id = id,
+            city = city,
+            street = street,
+            house = house,
+            apartment = apartment
+        )
+        Log.d("StoreViewModelAddress", "Updating user: $updatedAddress")
+        viewModelScope.launch {
+            try {
+                repository.updateAddress(updatedAddress)
+                Log.d("StoreViewModelAddress", "User data updated successfully")
+            } catch (e: Exception) {
+                Log.e("StoreViewModelAddress", "Error updating user: ${e.message}", e)
+            }
+        }
+    }
+
+    fun deleteAddress(address: Address) {
+        viewModelScope.launch {
+            repository.deleteAddress(address)
         }
     }
 }
