@@ -93,6 +93,24 @@ class UserViewModel @Inject constructor(private val repository: UserRepository) 
             false
         }
     }
+
+    suspend fun authenticateUser(login: String, password: String): Boolean {
+        Log.d("UserViewModel", "Authenticating user with login: $login")
+        return try {
+            val user = repository.getUserByPhone(login)
+            if (user != null && user.password == password) {
+                Log.d("UserViewModel", "Authentication successful for user: ${user.name}")
+                true
+            } else {
+                Log.d("UserViewModel", "Authentication failed: incorrect login or password")
+                false
+            }
+        } catch (e: Exception) {
+            Log.e("UserViewModel", "Error during authentication: ${e.message}", e)
+            false
+        }
+    }
+
     fun updatePaymentMethod(method: String) {
         _paymentMethod.value = method
         Log.d("UserViewModel", "Payment method updated: $method")

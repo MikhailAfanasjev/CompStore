@@ -13,16 +13,21 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import kotlinx.coroutines.launch
+import com.example.compstore.viewmodel.UserViewModel
 
 @Composable
 fun LoginScreen(
-    navController: NavController
+    navController: NavController,
+    userViewModel: UserViewModel = hiltViewModel()
 ) {
     var login by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var rememberMe by remember { mutableStateOf(false) }
     val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -37,10 +42,7 @@ fun LoginScreen(
         ) {
             TextField(
                 value = login,
-                onValueChange = {
-                    login = it
-                    Log.d("LoginScreen", "Login input changed: $login")
-                },
+                onValueChange = { login = it },
                 label = { Text("Номер телефона") },
                 modifier = Modifier.fillMaxWidth()
             )
@@ -48,10 +50,7 @@ fun LoginScreen(
 
             TextField(
                 value = password,
-                onValueChange = {
-                    password = it
-                    Log.d("LoginScreen", "Password input changed: ${if (it.isNotEmpty()) "****" else ""}")
-                },
+                onValueChange = { password = it },
                 label = { Text("Пароль") },
                 visualTransformation = PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
@@ -60,32 +59,22 @@ fun LoginScreen(
             Spacer(modifier = Modifier.height(8.dp))
 
             Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Checkbox(
-                    checked = rememberMe,
-                    onCheckedChange = {
-                        rememberMe = it
-                        Log.d("LoginScreen", "Remember Me checked: $rememberMe")
-                    }
-                )
-                Text(text = "Запомнить меня", modifier = Modifier.padding(start = 8.dp))
-            }
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Button(
                     onClick = {
                         if (login.isNotEmpty() && password.isNotEmpty()) {
-                            Log.d("LoginScreen", "User logged in with login: $login")
-                            Toast.makeText(context, "Вход выполнен", Toast.LENGTH_SHORT).show()
-                            navController.navigate("profile")
+                            coroutineScope.launch {
+                                val isAuthenticated = userViewModel.authenticateUser(login, password)
+                                if (isAuthenticated) {
+                                    Toast.makeText(context, "Вход выполнен", Toast.LENGTH_SHORT).show()
+                                    navController.navigate("profile")
+                                } else {
+                                    Toast.makeText(context, "Неверный логин или пароль", Toast.LENGTH_SHORT).show()
+                                }
+                            }
                         } else {
-                            Log.d("LoginScreen", "Login or password is empty")
                             Toast.makeText(context, "Введите логин и пароль", Toast.LENGTH_SHORT).show()
                         }
                     },

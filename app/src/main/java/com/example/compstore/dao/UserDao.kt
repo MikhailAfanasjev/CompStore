@@ -24,6 +24,9 @@ interface UserDao {
 //    @Query("DELETE FROM user")
 //    suspend fun clearUserData()
 
+    @Query("SELECT * FROM user WHERE telephoneNumber = :phone LIMIT 1")
+    suspend fun getUserByPhone(phone: String): User?
+
     @Update
     suspend fun updateUserData(user: User)
 }

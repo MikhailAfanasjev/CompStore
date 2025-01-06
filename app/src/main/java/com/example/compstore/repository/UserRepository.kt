@@ -31,6 +31,11 @@ class UserRepository @Inject constructor(
         return result
     }
 
+    suspend fun getUserByPhone(phone: String): User? {
+        Log.d("UserRepository", "getUserByPhone called with phone: $phone")
+        return userDao.getUserByPhone(phone)
+    }
+
     suspend fun updateUserData(user: User) {
         Log.d("UserRepository", "updateUserData called with user: $user")
         userDao.updateUserData(user)

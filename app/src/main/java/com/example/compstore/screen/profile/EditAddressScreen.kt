@@ -37,17 +37,20 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.compstore.modelDB.Address
 import com.example.compstore.viewmodel.AddressViewModel
+import com.example.compstore.viewmodel.UserViewModel
 
 @Composable
 fun EditAddressScreen(
     navController: NavController,
-    storeViewModel: AddressViewModel = hiltViewModel()
+    storeViewModel: AddressViewModel = hiltViewModel(),
+    userViewModel: UserViewModel = hiltViewModel()
 ) {
     var city by remember { mutableStateOf("") }
     var street by remember { mutableStateOf("") }
     var house by remember { mutableStateOf("") }
     var apartment by remember { mutableStateOf("") }
     var isDialogOpen by remember { mutableStateOf(false) }
+    var editingAddressId by remember { mutableStateOf<Int?>(null) }
     val context = LocalContext.current
 
     val userAddresses by storeViewModel.userAddresses.collectAsState()
@@ -67,6 +70,7 @@ fun EditAddressScreen(
                         street = address.street
                         house = address.house
                         apartment = address.apartment
+                        editingAddressId = address.id
                         isDialogOpen = true
                     },
                     onDeleteClick = {
@@ -102,8 +106,21 @@ fun EditAddressScreen(
                 onCancel = { isDialogOpen = false },
                 onSave = {
                     if (city.isNotEmpty() && street.isNotEmpty() && house.isNotEmpty() && apartment.isNotEmpty()) {
-                        storeViewModel.saveUserAddress(city, street, house, apartment)
-                        Toast.makeText(context, "Адрес сохранён", Toast.LENGTH_SHORT).show()
+                        if (editingAddressId != null) {
+                            // Если редактирование - вызываем updateAddress
+                            storeViewModel.updateAddress(
+                                id = editingAddressId!!,
+                                city = city,
+                                street = street,
+                                house = house,
+                                apartment = apartment
+                            )
+                            Toast.makeText(context, "Адрес обновлён", Toast.LENGTH_SHORT).show()
+                        } else {
+                            // Если добавление нового адреса - вызываем saveUserAddress
+                            storeViewModel.saveUserAddress(city, street, house, apartment)
+                            Toast.makeText(context, "Адрес сохранён", Toast.LENGTH_SHORT).show()
+                        }
                         isDialogOpen = false
                     } else {
                         Toast.makeText(context, "Заполните все поля", Toast.LENGTH_SHORT).show()

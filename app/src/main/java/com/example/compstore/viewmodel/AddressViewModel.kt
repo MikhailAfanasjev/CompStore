@@ -45,13 +45,13 @@ class AddressViewModel @Inject constructor(private val repository: AddressReposi
             house = house,
             apartment = apartment
         )
-        Log.d("StoreViewModelAddress", "Updating user: $updatedAddress")
+        Log.d("StoreViewModelAddress", "Updating address: $updatedAddress")
         viewModelScope.launch {
             try {
                 repository.updateAddress(updatedAddress)
-                Log.d("StoreViewModelAddress", "User data updated successfully")
+                Log.d("StoreViewModelAddress", "UAddress data updated successfully")
             } catch (e: Exception) {
-                Log.e("StoreViewModelAddress", "Error updating user: ${e.message}", e)
+                Log.e("StoreViewModelAddress", "Error updating address: ${e.message}", e)
             }
         }
     }

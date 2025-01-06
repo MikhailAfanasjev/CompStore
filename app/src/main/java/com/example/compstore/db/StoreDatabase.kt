@@ -25,7 +25,7 @@ abstract class StoreDatabase : RoomDatabase() {
                     StoreDatabase::class.java,
                     "storeNote"
                 )
-                    //.fallbackToDestructiveMigration()
+                    .fallbackToDestructiveMigration()
                     .build()
                 INSTANCE = instance
                 instance
