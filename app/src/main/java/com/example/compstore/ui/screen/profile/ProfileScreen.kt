@@ -1,4 +1,4 @@
-package com.example.compstore.screen.profile
+package com.example.compstore.ui.screen.profile
 
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
@@ -13,6 +13,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -23,15 +24,25 @@ import androidx.navigation.NavController
 import com.example.compstore.viewmodel.AddressViewModel
 import com.example.compstore.viewmodel.UserViewModel
 
+
 @Composable
 fun ProfileScreen(
     navController: NavController,
-    storeViewModel: AddressViewModel = hiltViewModel(),
+    addressViewModel: AddressViewModel = hiltViewModel(),
     userViewModel: UserViewModel = hiltViewModel()
 ) {
-    val user by userViewModel.user.collectAsState()
-    val userAddresses by storeViewModel.userAddresses.collectAsState()
+    // Используем поток loggedInUser в качестве источника данных
+    val user by userViewModel.loggedInUser.collectAsState()
+    val userAddresses by addressViewModel.userAddresses.collectAsState()
     val paymentMethod by userViewModel.paymentMethod.collectAsState()
+
+
+    LaunchedEffect(user) {
+        user?.let {
+            Log.d("ProfileScreen", "User ID set: ${it.id}")
+            addressViewModel.setUserId(it.id)
+        }
+    }
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -98,12 +109,18 @@ fun ProfileScreen(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     if (userAddresses.isEmpty()) {
+                        Log.d("AddressSection", "User addresses list is empty")
                         Text(
                             text = "Адрес не указан",
                             style = MaterialTheme.typography.bodyMedium
                         )
                     } else {
+                        Log.d("AddressSection", "User addresses count: ${userAddresses.size}")
                         userAddresses.forEach { address ->
+                            Log.d(
+                                "AddressSection",
+                                "Address: ${address.city}, ${address.street}, ${address.house}, ${address.apartment}"
+                            )
                             Text(
                                 text = "${address.city}, ${address.street}, ${address.house}, ${address.apartment}",
                                 style = MaterialTheme.typography.bodyMedium
@@ -132,42 +149,42 @@ fun ProfileScreen(
                 ) {
                     Log.d("ProfileScreen", "Opening Order History Section")
                     Text(
-                        text = "История заказов: ${user?.name ?: "Не указано"}",
+                        text = "История заказов:",
                         style = MaterialTheme.typography.bodyMedium
                     )
                     Spacer(modifier = Modifier.height(4.dp))
 
                     Button(
                         onClick = {
-                            Log.d("ProfileScreen", "Navigating to Edit History Screen")
-                            navController.navigate("editHistory")
+                            Log.d("ProfileScreen", "Navigating to History Screen")
+                            navController.navigate("historyScreen")
                         },
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Text("Редактировать")
+                        Text("История заказов")
                     }
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Payment Method
-                Column(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(
-                        text = "Способ оплаты: $paymentMethod",
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Button(
-                        onClick = {
-                            navController.navigate("editPaymentMethod")
-                        },
+                    // Payment Method
+                    Column(
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Text("Редактировать")
+                        Text(
+                            text = "Способ оплаты: ${if (paymentMethod.isEmpty()) "Не указано" else paymentMethod}",
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Button(
+                            onClick = {
+                                navController.navigate("editPaymentMethod")
+                            },
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text("Редактировать")
+                        }
                     }
-                }
 
                 Spacer(modifier = Modifier.height(16.dp))
 

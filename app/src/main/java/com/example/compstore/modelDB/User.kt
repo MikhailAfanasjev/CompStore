@@ -9,5 +9,7 @@ data class User(
     val name: String,
     val telephoneNumber: String,
     val email: String,
-    val password: String
+    val password: String,
+    val isLoggedIn: Boolean = false,
+    val paymentMethod: String
 )

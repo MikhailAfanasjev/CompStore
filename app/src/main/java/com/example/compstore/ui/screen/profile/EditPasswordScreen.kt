@@ -1,4 +1,4 @@
-package com.example.compstore.screen.profile
+package com.example.compstore.ui.screen.profile
 
 import android.util.Log
 import androidx.compose.foundation.layout.*

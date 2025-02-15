@@ -18,35 +18,73 @@ import javax.inject.Inject
 class UserViewModel @Inject constructor(private val repository: UserRepository) : ViewModel() {
 
     private val _paymentMethod = MutableStateFlow("Не выбран")
-    val paymentMethod: StateFlow<String> = _paymentMethod
+    val paymentMethod: StateFlow<String> get() = _paymentMethod
 
-    val user: StateFlow<User?> = repository.getUserDataFlow()
+    private val _user = MutableStateFlow<User?>(null)
+    val user: StateFlow<User?> = _user
+
+
+    val loggedInUser: StateFlow<User?> = repository.getLoggedInUser()
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = null
-        ).also {
-            Log.d("StoreViewModelAddress", "User state flow initialized")
+        )
+
+    init {
+        viewModelScope.launch {
+            repository.getLoggedInUser().collectLatest { currentUser ->
+                _user.value = currentUser
+                Log.d("UserViewModel", "User loaded on startup: $currentUser")
+            }
         }
+    }
+
+    fun loginUser(phone: String) {
+        viewModelScope.launch {
+            try {
+                repository.setLoggedInUser(phone)
+                val userFromDb = repository.getUserByPhone(phone)
+                _user.value = userFromDb
+                Log.d("UserViewModel", "User logged in: $phone")
+            } catch (e: Exception) {
+                Log.e("UserViewModel", "Error logging in user: ${e.message}", e)
+            }
+        }
+    }
+
+    fun logoutUser() {
+        viewModelScope.launch {
+            try {
+                repository.logoutUser()
+                _user.value = null // сбрасываем данные пользователя
+                Log.d("UserViewModel", "User logged out successfully")
+            } catch (e: Exception) {
+                Log.e("UserViewModel", "Error logging out user: ${e.message}", e)
+            }
+        }
+    }
 
     fun saveUser(name: String, phone: String, email: String, password: String) {
         val updatedUser = User(
             name = name,
             telephoneNumber = phone,
             email = email,
-            password = password
+            password = password,
+            isLoggedIn = true,
+            paymentMethod = paymentMethod.toString()
         )
-        Log.d("StoreViewModelAddress", "Saving user: $updatedUser")
+        Log.d("UserViewModelAddress", "Saving user: $updatedUser")
         viewModelScope.launch {
             try {
                 repository.insertUserData(updatedUser)
-                Log.d("StoreViewModelAddress", "User data saved successfully")
+                Log.d("UserViewModelAddress", "User data saved successfully")
                 repository.getUserDataFlow().collectLatest {
-                    Log.d("StoreViewModelAddress", "Emitting updated user data: $it")
+                    Log.d("UserViewModelAddress", "Emitting updated user data: $it")
                     (user as MutableStateFlow).emit(it)
                 }
             } catch (e: Exception) {
-                Log.e("StoreViewModelAddress", "Error saving user: ${e.message}", e)
+                Log.e("UserViewModelAddress", "Error saving user: ${e.message}", e)
             }
         }
     }
@@ -57,39 +95,29 @@ class UserViewModel @Inject constructor(private val repository: UserRepository) 
             name = name,
             telephoneNumber = phone,
             email = email,
-            password = password
+            password = password,
+            isLoggedIn = true,
+            paymentMethod = paymentMethod.toString()
         )
-        Log.d("StoreViewModelAddress", "Updating user: $updatedUser")
+        Log.d("UserViewModelAddress", "Updating user: $updatedUser")
         viewModelScope.launch {
             try {
                 repository.updateUserData(updatedUser)
-                Log.d("StoreViewModelAddress", "User data updated successfully")
+                Log.d("UserViewModelAddress", "User data updated successfully")
             } catch (e: Exception) {
-                Log.e("StoreViewModelAddress", "Error updating user: ${e.message}", e)
-            }
-        }
-    }
-
-    fun logoutUser() {
-        Log.d("StoreViewModelAddress", "Logging out user")
-        viewModelScope.launch {
-            try {
-                (user as MutableStateFlow).emit(null)
-                Log.d("StoreViewModelAddress", "User state reset successfully")
-            } catch (e: Exception) {
-                Log.e("StoreViewModelAddress", "Error logging out user: ${e.message}", e)
+                Log.e("UserViewModelAddress", "Error updating user: ${e.message}", e)
             }
         }
     }
 
     suspend fun hasUserData(): Boolean {
-        Log.d("StoreViewModelAddress", "Checking if user data exists")
+        Log.d("UserViewModelAddress", "Checking if user data exists")
         return try {
             val result = repository.hasUsers()
-            Log.d("StoreViewModelAddress", "Has user data: $result")
+            Log.d("UserViewModelAddress", "Has user data: $result")
             result
         } catch (e: Exception) {
-            Log.e("StoreViewModelAddress", "Error checking user data: ${e.message}", e)
+            Log.e("UserViewModelAddress", "Error checking user data: ${e.message}", e)
             false
         }
     }
@@ -112,7 +140,17 @@ class UserViewModel @Inject constructor(private val repository: UserRepository) 
     }
 
     fun updatePaymentMethod(method: String) {
-        _paymentMethod.value = method
-        Log.d("UserViewModel", "Payment method updated: $method")
+        viewModelScope.launch {
+            loggedInUser.value?.let { currentUser ->
+                val updatedUser = currentUser.copy(paymentMethod = method)
+                try {
+                    repository.updateUserData(updatedUser)
+                    _paymentMethod.value = method
+                    Log.d("UserViewModel", "Payment method updated and saved: $method")
+                } catch (e: Exception) {
+                    Log.e("UserViewModel", "Error updating payment method: ${e.message}", e)
+                }
+            }
+        }
     }
 }

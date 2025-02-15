@@ -72,7 +72,8 @@ dependencies {
     implementation(libs.androidx.runtime.livedata)
     implementation(libs.androidx.espresso.core)
     implementation(libs.androidx.recyclerview)
-    implementation(libs.androidx.appcompat) // Основная библиотека Room
+    implementation(libs.androidx.appcompat)
+    implementation(libs.protolite.well.known.types) // Основная библиотека Room
     kapt(libs.androidx.room.compiler) // Компилятор Room для аннотаций
     implementation(libs.androidx.room.ktx) // KTX версия Room для удобства использования
     implementation("androidx.core:core-ktx:1.13.1")

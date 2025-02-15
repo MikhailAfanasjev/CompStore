@@ -1,4 +1,4 @@
-package com.example.compstore.screen.profile
+package com.example.compstore.ui.screen.profile
 
 import android.util.Log
 import android.widget.Toast
@@ -11,12 +11,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import kotlinx.coroutines.launch
 import com.example.compstore.viewmodel.UserViewModel
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.first
 
 @Composable
 fun LoginScreen(
@@ -68,6 +69,9 @@ fun LoginScreen(
                             coroutineScope.launch {
                                 val isAuthenticated = userViewModel.authenticateUser(login, password)
                                 if (isAuthenticated) {
+                                    userViewModel.loginUser(login)
+                                    // Ждём, пока данные пользователя не будут загружены (т.е. user станет ненулевым)
+                                    userViewModel.user.filter { it != null }.first()
                                     Toast.makeText(context, "Вход выполнен", Toast.LENGTH_SHORT).show()
                                     navController.navigate("profile")
                                 } else {

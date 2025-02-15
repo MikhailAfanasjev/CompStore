@@ -3,10 +3,12 @@ package com.example.compstore.modelDB
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
-import androidx.room.PrimaryKey
+
+const val LOCAL_USER_ID = -1
 
 @Entity(
-    tableName = "address",
+    tableName = "cart_items",
+    primaryKeys = ["userId", "productId"],
     foreignKeys = [ForeignKey(
         entity = User::class,
         parentColumns = ["id"],
@@ -15,11 +17,8 @@ import androidx.room.PrimaryKey
     )],
     indices = [Index("userId")]
 )
-data class Address(
-    @PrimaryKey(autoGenerate = true) var id: Int = 0,
-    val city: String,
-    val street: String,
-    val house: String,
-    val apartment: String,
-    val userId: Int // Связь с таблицей User
+data class CartItem(
+    val userId: Int,
+    val productId: Int,
+    val quantity: Int = 1
 )

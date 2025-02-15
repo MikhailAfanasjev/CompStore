@@ -51,7 +51,7 @@ fun ButtonBar(navController: NavController) {
             label = { Text("Chat") },
             icon = {
                 Icon(
-                    Icons.Default.Email, //значка чата нет
+                    Icons.Default.Email,
                     contentDescription = "Chat",
                     tint = Color.Black,
                     modifier = Modifier.size(48.dp)

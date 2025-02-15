@@ -1,5 +1,6 @@
-package com.example.compstore.screen.profile
+package com.example.compstore.ui.screen.profile
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -24,6 +25,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -42,9 +44,10 @@ import com.example.compstore.viewmodel.UserViewModel
 @Composable
 fun EditAddressScreen(
     navController: NavController,
-    storeViewModel: AddressViewModel = hiltViewModel(),
+    addressViewModel: AddressViewModel = hiltViewModel(),
     userViewModel: UserViewModel = hiltViewModel()
 ) {
+
     var city by remember { mutableStateOf("") }
     var street by remember { mutableStateOf("") }
     var house by remember { mutableStateOf("") }
@@ -53,8 +56,15 @@ fun EditAddressScreen(
     var editingAddressId by remember { mutableStateOf<Int?>(null) }
     val context = LocalContext.current
 
-    val userAddresses by storeViewModel.userAddresses.collectAsState()
+    val user by userViewModel.user.collectAsState()
+    val userAddresses by addressViewModel.userAddresses.collectAsState()
 
+    LaunchedEffect(user) {
+        user?.let {
+            Log.d("EditAddressScreen", "User ID set: ${it.id}")
+            addressViewModel.setUserId(it.id)
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -66,6 +76,7 @@ fun EditAddressScreen(
                 CurrentAddressField(
                     address = address,
                     onEditClick = {
+                        Log.d("EditAddressScreen", "Edit clicked for address ID: ${address.id}")
                         city = address.city
                         street = address.street
                         house = address.house
@@ -74,7 +85,8 @@ fun EditAddressScreen(
                         isDialogOpen = true
                     },
                     onDeleteClick = {
-                        storeViewModel.deleteAddress(address)
+                        Log.d("EditAddressScreen", "Delete clicked for address ID: ${address.id}")
+                        addressViewModel.deleteAddress(address)
                         Toast.makeText(context, "Адрес удалён", Toast.LENGTH_SHORT).show()
                     }
                 )
@@ -84,6 +96,7 @@ fun EditAddressScreen(
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(onClick = {
+            Log.d("EditAddressScreen", "Add address button clicked")
             city = ""
             street = ""
             house = ""
@@ -94,35 +107,72 @@ fun EditAddressScreen(
         }
 
         if (isDialogOpen) {
+            Log.d("EditAddressScreen", "Address input dialog opened")
             AddressInputDialog(
                 city = city,
                 street = street,
                 house = house,
                 apartment = apartment,
-                onCityChange = { city = it },
-                onStreetChange = { street = it },
-                onHouseChange = { house = it },
-                onApartmentChange = { apartment = it },
-                onCancel = { isDialogOpen = false },
+                onCityChange = {
+                    Log.d("EditAddressScreen", "City changed to: $it")
+                    city = it
+                },
+                onStreetChange = {
+                    Log.d("EditAddressScreen", "Street changed to: $it")
+                    street = it
+                },
+                onHouseChange = {
+                    Log.d("EditAddressScreen", "House changed to: $it")
+                    house = it
+                },
+                onApartmentChange = {
+                    Log.d("EditAddressScreen", "Apartment changed to: $it")
+                    apartment = it
+                },
+                onCancel = {
+                    Log.d("EditAddressScreen", "Dialog cancelled")
+                    isDialogOpen = false
+                },
                 onSave = {
+                    Log.d("EditAddressScreen", "Save button clicked")
                     if (city.isNotEmpty() && street.isNotEmpty() && house.isNotEmpty() && apartment.isNotEmpty()) {
-                        if (editingAddressId != null) {
-                            // Если редактирование - вызываем updateAddress
-                            storeViewModel.updateAddress(
-                                id = editingAddressId!!,
-                                city = city,
-                                street = street,
-                                house = house,
-                                apartment = apartment
-                            )
-                            Toast.makeText(context, "Адрес обновлён", Toast.LENGTH_SHORT).show()
+                        val currentUserId = user?.id
+                        if (currentUserId != null) {
+                            if (editingAddressId != null) {
+                                Log.d(
+                                    "EditAddressScreen",
+                                    "Updating address ID: $editingAddressId with values: $city, $street, $house, $apartment"
+                                )
+                                addressViewModel.updateAddress(
+                                    editingAddressId!!,
+                                    city,
+                                    street,
+                                    house,
+                                    apartment,
+                                    currentUserId
+                                )
+                                Toast.makeText(context, "Адрес обновлён", Toast.LENGTH_SHORT).show()
+                            } else {
+                                Log.d(
+                                    "EditAddressScreen",
+                                    "Saving new address with values: $city, $street, $house, $apartment"
+                                )
+                                addressViewModel.saveUserAddress(
+                                    city = city,
+                                    street = street,
+                                    house = house,
+                                    apartment = apartment,
+                                    currentUserId
+                                )
+                                Toast.makeText(context, "Адрес сохранён", Toast.LENGTH_SHORT).show()
+                            }
+                            isDialogOpen = false
                         } else {
-                            // Если добавление нового адреса - вызываем saveUserAddress
-                            storeViewModel.saveUserAddress(city, street, house, apartment)
-                            Toast.makeText(context, "Адрес сохранён", Toast.LENGTH_SHORT).show()
+                            Log.w("EditAddressScreen", "User not found, cannot save address")
+                            Toast.makeText(context, "Пользователь не найден", Toast.LENGTH_SHORT).show()
                         }
-                        isDialogOpen = false
                     } else {
+                        Log.w("EditAddressScreen", "Fields are empty, cannot save address")
                         Toast.makeText(context, "Заполните все поля", Toast.LENGTH_SHORT).show()
                     }
                 }

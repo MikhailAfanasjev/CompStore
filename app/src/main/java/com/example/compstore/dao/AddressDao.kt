@@ -14,8 +14,8 @@ interface AddressDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAddress(address: Address)
 
-    @Query("SELECT * FROM address")
-    fun getAddresses(): Flow<List<Address>>
+    @Query("SELECT * FROM address WHERE userId = :userId")
+    fun getAddressesForUser(userId: Int): Flow<List<Address>>
 
     @Update
     suspend fun updateAddress(address: Address)

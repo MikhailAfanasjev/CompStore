@@ -42,6 +42,22 @@ class UserRepository @Inject constructor(
         Log.d("UserRepository", "User data updated")
     }
 
+    fun getLoggedInUser(): Flow<User?> {
+        Log.d("UserRepository", "getLoggedInUser called")
+        return userDao.getLoggedInUser()
+    }
+
+    suspend fun setLoggedInUser(phone: String) {
+        Log.d("UserRepository", "setLoggedInUser called for phone: $phone")
+        userDao.logoutAllUsers() // Сбрасываем статус всех пользователей
+        userDao.setLoggedInUser(phone) // Устанавливаем флаг для нового пользователя
+    }
+
+    suspend fun logoutUser() {
+        Log.d("UserRepository", "logoutUser called")
+        userDao.logoutAllUsers() // Сбрасываем всех пользователей
+    }
+
 //    suspend fun clearUserData() {
 //        Log.d("UserRepository", "clearUserData called")
 //        userDao.clearUserData()

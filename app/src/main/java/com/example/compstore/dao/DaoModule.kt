@@ -27,4 +27,16 @@ object DaoModule {
         Log.d("DaoModule", "Providing UserDao instance")
         return StoreDatabase.getDatabase(appContext).addressDAO()
     }
+
+    @Provides
+    @Singleton
+    fun provideCartItemDao(@ApplicationContext appContext: Context): CartItemDao {
+        return StoreDatabase.getDatabase(appContext).cartItemDAO()
+    }
+
+    @Provides
+    @Singleton
+    fun provideOrderDao(@ApplicationContext appContext: Context): OrderDao {
+        return StoreDatabase.getDatabase(appContext).orderDAO()
+    }
 }

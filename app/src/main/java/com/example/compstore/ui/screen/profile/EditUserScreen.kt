@@ -1,4 +1,4 @@
-package com.example.compstore.screen.profile
+package com.example.compstore.ui.screen.profile
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement

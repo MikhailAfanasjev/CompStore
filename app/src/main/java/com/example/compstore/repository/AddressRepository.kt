@@ -8,17 +8,16 @@ import javax.inject.Singleton
 
 @Singleton
 class AddressRepository @Inject constructor(
-    private val addressDao: AddressDao)
-{
+    private val addressDao: AddressDao
+) {
 
     suspend fun insertAddress(address: Address) = addressDao.insertAddress(address)
 
-    fun getUserAddressesFlow(): Flow<List<Address>> = addressDao.getAddresses()
+    fun getUserAddressesFlow(userId: Int): Flow<List<Address>> =
+        addressDao.getAddressesForUser(userId)
 
     suspend fun updateAddress(address: Address) {
-        Log.d("UserRepository", "updateAddress called with user: $address")
         addressDao.updateAddress(address)
-        Log.d("UserRepository", "User data updated")
     }
 
     suspend fun deleteAddress(address: Address) {
