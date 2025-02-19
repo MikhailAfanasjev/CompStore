@@ -53,7 +53,6 @@ class OrderHistoryViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            // Подписываемся на изменения авторизованного пользователя
             userRepository.getLoggedInUser().collectLatest { user ->
                 if (user != null) {
                     Log.d("OrderHistoryViewModel", "Пользователь авторизовался: id = ${user.id}")
@@ -71,7 +70,7 @@ class OrderHistoryViewModel @Inject constructor(
             viewModelScope.launch {
                 Log.d("OrderHistoryViewModel", "Начало оформления покупки для пользователя с id: $currentUserId")
 
-                // Собираем корзину для авторизованного пользователя
+// Собираем корзину для авторизованного пользователя
                 val basketItems = cartItems.value.mapNotNull { cartItem ->
                     val product = allProducts.find { it.productId == cartItem.productId }
                     if (product == null) {
@@ -87,29 +86,30 @@ class OrderHistoryViewModel @Inject constructor(
                     Log.d("OrderHistoryViewModel", "Найдено ${basketItems.size} элементов в корзине для пользователя с id: $currentUserId")
                 }
 
-                // Вычисляем итоговую сумму заказа
+// Вычисляем итоговую сумму заказа
                 val totalSum = basketItems.sumOf { (product, quantity) ->
                     product.price.filter { it.isDigit() }.toInt() * quantity
                 }
                 Log.d("OrderHistoryViewModel", "Итоговая сумма заказа: $totalSum")
 
-                // Получаем текущее время оформления заказа
+// Получаем текущее время оформления заказа
                 val currentTime = SimpleDateFormat("HH:mm dd.MM.yyyy", Locale.getDefault()).format(Date())
                 Log.d("OrderHistoryViewModel", "Время оформления заказа: $currentTime")
 
-                // Формируем объект заказа
+// Формируем объект заказа с сохранением списка productIds
                 val order = Order(
                     userId = currentUserId,
                     orderTime = currentTime,
-                    totalPrice = "$totalSum ₽"
+                    totalPrice = "$totalSum ₽",
+                    productIds = basketItems.map { it.first.productId }
                 )
                 Log.d("OrderHistoryViewModel", "Создан заказ: $order")
 
-                // Сохраняем заказ в базу данных
+// Сохраняем заказ в базу данных
                 orderRepository.insertOrder(order)
                 Log.d("OrderHistoryViewModel", "Заказ успешно сохранён в базе данных")
 
-                // Очищаем корзину для текущего пользователя
+// Очищаем корзину для текущего пользователя
                 cartItemRepository.clearCartByUserId(currentUserId)
                 Log.d("OrderHistoryViewModel", "Корзина для пользователя с id: $currentUserId очищена")
             }

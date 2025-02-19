@@ -36,9 +36,9 @@ fun ProductDetailsDialog(
     onDismiss: () -> Unit,
     onAddToCart: (Product) -> Unit
 ) {
-    Log.d("ProductDetailsDialog", "Opening Product Details Dialog for: ${product.name}")
+    Log.d("ProductDetailsDialog", "Открытие диалога для: ${product.name}")
 
-    Dialog(onDismissRequest = { onDismiss() }) {
+    Dialog(onDismissRequest = onDismiss) {
         Surface(
             shape = RoundedCornerShape(16.dp),
             modifier = Modifier
@@ -52,9 +52,9 @@ fun ProductDetailsDialog(
                     .padding(16.dp)
                     .fillMaxWidth()
             ) {
-                product.imageResId?.let {
+                product.imageResId?.let { imageId ->
                     Image(
-                        painter = painterResource(id = it),
+                        painter = painterResource(id = imageId),
                         contentDescription = null,
                         modifier = Modifier
                             .fillMaxWidth()

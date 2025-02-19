@@ -34,6 +34,12 @@ import com.example.compstore.ui.screen.ChatScreen
 import com.example.compstore.ui.screen.HomeScreen
 import com.example.compstore.ui.screen.OrderScreen
 import com.example.compstore.ui.screen.PCComponentsScreens.CoolersScreen
+import com.example.compstore.ui.screen.PCComponentsScreens.DataClasses.coolers
+import com.example.compstore.ui.screen.PCComponentsScreens.DataClasses.gpus
+import com.example.compstore.ui.screen.PCComponentsScreens.DataClasses.motherboards
+import com.example.compstore.ui.screen.PCComponentsScreens.DataClasses.processors
+import com.example.compstore.ui.screen.PCComponentsScreens.DataClasses.psus
+import com.example.compstore.ui.screen.PCComponentsScreens.DataClasses.ramModules
 import com.example.compstore.ui.screen.PCComponentsScreens.MotherboardsScreen
 import com.example.compstore.ui.screen.PCComponentsScreens.PSUScreen
 import com.example.compstore.ui.screen.PCComponentsScreens.ProcessorsScreen
@@ -210,7 +216,7 @@ fun NavGraph() {
                 RegistrationScreen(navController)
             }
             composable("historyScreen") {
-                HistoryScreen()
+                HistoryScreen(allProducts = processors + gpus + psus + motherboards + coolers + ramModules)
             }
             composable("editAddress") {
                 EditAddressScreen(navController)

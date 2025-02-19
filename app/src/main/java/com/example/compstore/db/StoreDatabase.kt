@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
 import com.example.compstore.dao.AddressDao
 import com.example.compstore.dao.CartItemDao
 import com.example.compstore.dao.OrderDao
@@ -12,8 +13,10 @@ import com.example.compstore.modelDB.User
 import com.example.compstore.modelDB.Address
 import com.example.compstore.modelDB.CartItem
 import com.example.compstore.modelDB.Order
+import com.example.compstore.utils.Converters
 
 @Database(entities = [User::class, Address::class, CartItem::class, Order::class], version = 1)
+@TypeConverters(Converters::class)
 abstract class StoreDatabase : RoomDatabase() {
 
     abstract fun userDAO(): UserDao
