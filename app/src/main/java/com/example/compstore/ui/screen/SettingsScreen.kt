@@ -6,9 +6,13 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -17,44 +21,42 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.rememberNavController
 import coil3.compose.AsyncImage
+import com.example.compstore.utils.scaleDimension
 import com.example.linguareader.R
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen() {
-        Surface(
-            modifier = Modifier
-                .fillMaxSize(),
-            color = MaterialTheme.colorScheme.background
-        ) {
-            Box(modifier = Modifier.fillMaxSize()) {
-                // Фоновое изображение
-                AsyncImage(
-                    model = R.drawable.fone,
-                    contentDescription = "Фоновое изображение",
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.fillMaxSize()
-                )
-                Column(
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    Text(
-                        text = "Settings Screen",
-                        style = MaterialTheme.typography.headlineMedium
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text(
-                        text = "Welcome to the Settings Screen!",
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                }
-            }
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Настройки") }
+            )
         }
-}
-@Preview(showBackground = true)
-@Composable
-fun SettingsScreenPreview() {
-    val navController = rememberNavController()
-    SettingsScreen()
+    ) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .padding(scaleDimension(16.dp))
+        ) {
+            Text(
+                text = "Информация о приложении",
+                style = MaterialTheme.typography.titleLarge
+            )
+            Spacer(modifier = Modifier.height(scaleDimension(8.dp)))
+
+            // Основная информация о приложении
+            Text(text = "Название: CompStore")
+            Text(text = "Версия: 1.0.0")
+            Text(text = "Разработчик: Misha")
+
+            Spacer(modifier = Modifier.height(scaleDimension(16.dp)))
+            Text(
+                text = "Описание: Это демонстрационное приложение, " +
+                        "показывающее работу с Jetpack Compose.",
+                style = MaterialTheme.typography.bodyLarge
+            )
+        }
+    }
 }

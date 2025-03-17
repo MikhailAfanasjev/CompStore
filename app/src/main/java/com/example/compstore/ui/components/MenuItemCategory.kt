@@ -15,12 +15,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.compstore.ui.theme.PrimaryText
 
 @Composable
 fun MenuItemCategory(
@@ -31,8 +33,12 @@ fun MenuItemCategory(
 ) {
     Column(
         modifier = modifier
-            .clickable { onClick() }
+            .shadow(
+                elevation = 4.dp,
+                shape = RoundedCornerShape(8.dp)
+            )
             .background(Color.White, shape = RoundedCornerShape(8.dp))
+            .clickable { onClick() }
             .padding(8.dp)
             .fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -51,7 +57,8 @@ fun MenuItemCategory(
             text = name,
             textAlign = TextAlign.Center,
             style = MaterialTheme.typography.bodySmall.copy(
-                fontSize = 16.sp
+                fontSize = 16.sp,
+                color = PrimaryText // Основной текст – темно-серый
             ),
             maxLines = 2,
             overflow = TextOverflow.Ellipsis,

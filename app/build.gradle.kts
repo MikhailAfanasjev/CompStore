@@ -12,6 +12,7 @@ android {
     compileSdk = 34
 
     defaultConfig {
+        buildConfigField("String", "API_KEY", "\"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\"")
         applicationId = "com.example.linguareader"
         minSdk = 29
         targetSdk = 34
@@ -51,6 +52,10 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+    buildFeatures {
+        buildConfig = true
+        compose = true
+    }
 }
 
 dependencies {
@@ -73,7 +78,8 @@ dependencies {
     implementation(libs.androidx.espresso.core)
     implementation(libs.androidx.recyclerview)
     implementation(libs.androidx.appcompat)
-    implementation(libs.protolite.well.known.types) // Основная библиотека Room
+    implementation(libs.protolite.well.known.types)
+    implementation(libs.androidx.ui.test.android) // Основная библиотека Room
     kapt(libs.androidx.room.compiler) // Компилятор Room для аннотаций
     implementation(libs.androidx.room.ktx) // KTX версия Room для удобства использования
     implementation("androidx.core:core-ktx:1.13.1")
@@ -101,6 +107,12 @@ dependencies {
     // Дебаг зависимости
     debugImplementation(libs.androidx.ui.tooling)  // Предпросмотр инструментов
     debugImplementation(libs.androidx.ui.test.manifest)  // Манифест для тестирования
+
+    // Retrofit и конвертер Gson для работы с сетью
+    implementation(libs.retrofit.v2100)
+    implementation(libs.converter.gson.v2100)
+
+    implementation ("androidx.security:security-crypto:1.1.0-alpha06")
 }
 kapt {
     correctErrorTypes = true

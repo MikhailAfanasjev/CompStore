@@ -50,4 +50,9 @@ class CartItemRepository @Inject constructor(
         cartItemDao.updateCartItemQuantity(userId, productId, quantity)
         Log.d(TAG, "Quantity updated successfully.")
     }
+    suspend fun removeCartItems(userId: Int, productIds: List<Int>) {
+        Log.d(TAG, "Removing purchased items from cart for userId: $userId, productIds: $productIds")
+        cartItemDao.removeCartItems(userId, productIds)
+        Log.d(TAG, "Purchased items removed successfully.")
+    }
 }

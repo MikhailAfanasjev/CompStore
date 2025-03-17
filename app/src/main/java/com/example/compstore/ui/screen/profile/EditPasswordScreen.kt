@@ -6,13 +6,21 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.example.compstore.ui.components.CustomButton
+import com.example.compstore.ui.theme.AccentOrange
+import com.example.compstore.ui.theme.BackgroundLightGrey
+import com.example.compstore.ui.theme.BrightOrange
+import com.example.compstore.ui.theme.PrimaryText
+import com.example.compstore.utils.scaleDimension
 import com.example.compstore.viewmodel.UserViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditPasswordScreen(
     navController: NavController,
@@ -27,64 +35,75 @@ fun EditPasswordScreen(
 
     Surface(
         modifier = Modifier.fillMaxSize(),
-        color = MaterialTheme.colorScheme.background
+        color = BackgroundLightGrey
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp),
+                .padding(scaleDimension(16.dp)),
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.Start
         ) {
             Text(
                 text = "Изменение пароля",
-                style = MaterialTheme.typography.headlineSmall
+                style = MaterialTheme.typography.headlineSmall,
+                color = PrimaryText
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(scaleDimension(16.dp)))
 
             OutlinedTextField(
                 value = currentPassword,
                 onValueChange = { currentPassword = it },
-                label = { Text("Текущий пароль") },
+                label = { Text("Текущий пароль", color = PrimaryText) },
                 visualTransformation = if (showPassword) VisualTransformation.None else PasswordVisualTransformation(),
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                textStyle = TextStyle(color = PrimaryText)
             )
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(scaleDimension(8.dp)))
 
             OutlinedTextField(
                 value = newPassword,
                 onValueChange = { newPassword = it },
-                label = { Text("Новый пароль") },
+                label = { Text("Новый пароль", color = PrimaryText) },
                 visualTransformation = if (showPassword) VisualTransformation.None else PasswordVisualTransformation(),
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                textStyle = TextStyle(color = PrimaryText)
             )
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(scaleDimension(8.dp)))
 
             OutlinedTextField(
                 value = confirmPassword,
                 onValueChange = { confirmPassword = it },
-                label = { Text("Подтверждение пароля") },
+                label = { Text("Подтверждение пароля", color = PrimaryText) },
                 visualTransformation = if (showPassword) VisualTransformation.None else PasswordVisualTransformation(),
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                textStyle = TextStyle(color = PrimaryText),
+                colors = TextFieldDefaults.textFieldColors(
+                    containerColor = BrightOrange
+                )
             )
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(scaleDimension(8.dp)))
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 TextButton(onClick = { showPassword = !showPassword }) {
-                    Text(if (showPassword) "Скрыть пароль" else "Показать пароль")
+                    Text(
+                        text = if (showPassword) "Скрыть пароль" else "Показать пароль",
+                        color = AccentOrange
+                    )
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(scaleDimension(16.dp)))
 
-            Button(
+            CustomButton(
+                text = "Сохранить",
                 onClick = {
                     if (newPassword == confirmPassword && user != null) {
                         userViewModel.updateUser(
@@ -101,22 +120,18 @@ fun EditPasswordScreen(
                     }
                 },
                 modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Сохранить")
-            }
+            )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(scaleDimension(16.dp)))
 
-            Button(
+            CustomButton(
+                text = "Отмена",
                 onClick = {
                     Log.d("EditPasswordScreen", "Navigating back")
                     navController.popBackStack()
                 },
-                modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
-            ) {
-                Text("Отмена")
-            }
+                modifier = Modifier.fillMaxWidth()
+            )
         }
     }
 }

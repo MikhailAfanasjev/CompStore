@@ -10,7 +10,8 @@ import javax.inject.Singleton
 
 @Singleton
 class UserRepository @Inject constructor(
-    private val userDao: UserDao
+    private val userDao: UserDao,
+    private var deleteOnExit: Boolean
 ) {
 
     fun getUserDataFlow(): Flow<User?> {
@@ -56,6 +57,20 @@ class UserRepository @Inject constructor(
     suspend fun logoutUser() {
         Log.d("UserRepository", "logoutUser called")
         userDao.logoutAllUsers() // Сбрасываем всех пользователей
+    }
+
+    fun markUserForDeletion() {
+        deleteOnExit = true
+        Log.d("UserRepository", "User marked for deletion on exit")
+    }
+
+    fun shouldDeleteUserOnExit(): Boolean {
+        return deleteOnExit
+    }
+
+    suspend fun clearUserData() {
+        Log.d("UserRepository", "Clearing user data from database")
+        userDao.logoutAllUsers()
     }
 
 //    suspend fun clearUserData() {

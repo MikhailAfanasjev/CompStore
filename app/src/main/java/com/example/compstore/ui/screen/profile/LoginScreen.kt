@@ -8,17 +8,27 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.example.compstore.ui.components.CustomButton
+import com.example.compstore.ui.theme.AccentOrange
+import com.example.compstore.ui.theme.BackgroundLightGrey
+import com.example.compstore.ui.theme.BrightOrange
+import com.example.compstore.ui.theme.CardBackground
+import com.example.compstore.ui.theme.PrimaryText
+import com.example.compstore.utils.scaleDimension
 import kotlinx.coroutines.launch
 import com.example.compstore.viewmodel.UserViewModel
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(
     navController: NavController,
@@ -32,46 +42,71 @@ fun LoginScreen(
 
     Surface(
         modifier = Modifier.fillMaxSize(),
-        color = MaterialTheme.colorScheme.background
+        color = BackgroundLightGrey
     ) {
         Column(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp)
+                .padding(scaleDimension(16.dp))
         ) {
             TextField(
                 value = login,
                 onValueChange = { login = it },
-                label = { Text("Номер телефона") },
-                modifier = Modifier.fillMaxWidth()
+                label = { Text("Номер телефона", color = PrimaryText) },
+                modifier = Modifier.fillMaxWidth(),
+                textStyle = TextStyle(color = PrimaryText),
+                colors = TextFieldDefaults.textFieldColors(
+                    containerColor = BrightOrange
+                )
             )
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(scaleDimension(8.dp)))
 
             TextField(
                 value = password,
                 onValueChange = { password = it },
-                label = { Text("Пароль") },
+                label = { Text("Пароль", color = PrimaryText) },
                 visualTransformation = PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                textStyle = TextStyle(color = PrimaryText),
+                colors = TextFieldDefaults.textFieldColors(
+                    containerColor = BrightOrange
+                )
             )
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(scaleDimension(8.dp)))
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Checkbox(
+                    checked = rememberMe,
+                    onCheckedChange = { rememberMe = it },
+                    colors = CheckboxDefaults.colors(checkedColor = AccentOrange)
+                )
+                Text(
+                    text = "Запомнить меня",
+                    modifier = Modifier.padding(start = scaleDimension(8.dp)),
+                    color = PrimaryText
+                )
+            }
+            Spacer(modifier = Modifier.height(scaleDimension(8.dp)))
 
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Button(
+                // Кнопка "Войти"
+                CustomButton(
+                    text = "Войти",
                     onClick = {
                         if (login.isNotEmpty() && password.isNotEmpty()) {
                             coroutineScope.launch {
                                 val isAuthenticated = userViewModel.authenticateUser(login, password)
                                 if (isAuthenticated) {
-                                    userViewModel.loginUser(login)
-                                    // Ждём, пока данные пользователя не будут загружены (т.е. user станет ненулевым)
-                                    userViewModel.user.filter { it != null }.first()
+                                    userViewModel.loginUser(login, rememberMe)
                                     Toast.makeText(context, "Вход выполнен", Toast.LENGTH_SHORT).show()
                                     navController.navigate("profile")
                                 } else {
@@ -82,28 +117,21 @@ fun LoginScreen(
                             Toast.makeText(context, "Введите логин и пароль", Toast.LENGTH_SHORT).show()
                         }
                     },
-                    enabled = login.isNotEmpty() && password.isNotEmpty()
-                ) {
-                    Text("Войти")
-                }
+                    modifier = Modifier.width(scaleDimension(100.dp))
+                )
 
-                Spacer(modifier = Modifier.width(8.dp))
+                Spacer(modifier = Modifier.width(scaleDimension(8.dp)))
 
-                Button(
+                // Кнопка "Зарегистрироваться"
+                CustomButton(
+                    text = "Зарегистрироваться",
                     onClick = {
                         Log.d("LoginScreen", "Navigating to Registration screen")
                         navController.navigate("registration")
-                    }
-                ) {
-                    Text("Зарегистрироваться")
-                }
+                    },
+                    modifier = Modifier.weight(1f)
+                )
             }
         }
     }
 }
-
-//@Preview(showBackground = true)
-//@Composable
-//fun PreviewLoginScreen() {
-//
-//}

@@ -1,4 +1,4 @@
-package com.example.compstore.ui.screen.PCComponentsScreens
+package com.example.compstore.ui.components
 
 import android.util.Log
 import androidx.compose.foundation.Image
@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
@@ -27,7 +28,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import com.example.compstore.ui.screen.PCComponentsScreens.DataClasses.GPU
+import com.example.compstore.ui.screen.PCComponentsScreens.Product
+import com.example.compstore.ui.theme.AccentOrange
+import com.example.compstore.ui.theme.CardBackground
+import com.example.compstore.ui.theme.PrimaryText
 
 
 @Composable
@@ -45,7 +49,7 @@ fun ProductDetailsDialog(
                 .fillMaxWidth()
                 .wrapContentHeight()
                 .padding(8.dp),
-            color = MaterialTheme.colorScheme.surface
+            color = CardBackground
         ) {
             Column(
                 modifier = Modifier
@@ -77,7 +81,7 @@ fun ProductDetailsDialog(
                         fontWeight = FontWeight.Bold,
                         fontSize = 20.sp
                     ),
-                    color = MaterialTheme.colorScheme.secondary
+                    color = AccentOrange
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
@@ -91,20 +95,20 @@ fun ProductDetailsDialog(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    TextButton(onClick = onDismiss) {
-                        Text("Закрыть")
-                    }
-                    Button(
+                    CustomButton(
+                        text = "Закрыть",
+                        onClick = onDismiss,
+                        modifier = Modifier.weight(1f)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    CustomButton(
+                        text = "В корзину",
                         onClick = {
                             onAddToCart(product)
                             onDismiss()
                         },
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.primary
-                        )
-                    ) {
-                        Text("Добавить в корзину", color = MaterialTheme.colorScheme.onPrimary)
-                    }
+                        modifier = Modifier.weight(1f)
+                    )
                 }
             }
         }

@@ -25,4 +25,7 @@ interface CartItemDao {
     // Новый метод для обновления количества товара
     @Query("UPDATE cart_items SET quantity = :quantity WHERE userId = :userId AND productId = :productId")
     suspend fun updateCartItemQuantity(userId: Int, productId: Int, quantity: Int)
+
+    @Query("DELETE FROM cart_items WHERE userId = :userId AND productId IN (:productIds)")
+    suspend fun removeCartItems(userId: Int, productIds: List<Int>)
 }

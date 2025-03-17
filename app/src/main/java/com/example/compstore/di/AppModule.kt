@@ -8,13 +8,20 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 
-@Module // Модуль hilt для предоставления зависимостей
-@InstallIn(SingletonComponent::class) // Указывает что зависимости будут жить в Singletonе
+@Module
+@InstallIn(SingletonComponent::class)
 object AppModule {
-    @Provides // Обозначает метод для добавления зависимостей
-    fun provideStoreRememberWorker(context: Context, // Контекс приложения
-                                  workerParams: WorkerParameters //Параметры для рабочего задания
+
+    @Provides
+    fun provideStoreRememberWorker(
+        context: Context,
+        workerParams: WorkerParameters
     ): StoreRememberWorker {
-        return StoreRememberWorker(context, workerParams)//Возвращаем экземпляр TaskRememberWorker
+        return StoreRememberWorker(context, workerParams)
+    }
+
+    @Provides
+    fun provideDeleteOnExit(): Boolean {
+        return false // или загрузи это значение из настроек
     }
 }

@@ -40,13 +40,17 @@ class UserViewModel @Inject constructor(private val repository: UserRepository) 
         }
     }
 
-    fun loginUser(phone: String) {
+    fun loginUser(phone: String, rememberMe: Boolean) {
         viewModelScope.launch {
             try {
                 repository.setLoggedInUser(phone)
                 val userFromDb = repository.getUserByPhone(phone)
                 _user.value = userFromDb
-                Log.d("UserViewModel", "User logged in: $phone")
+                Log.d("UserViewModel", "User logged in: $phone, rememberMe: $rememberMe")
+
+                if (!rememberMe) {
+                    repository.markUserForDeletion() // Помечаем пользователя для удаления при выходе
+                }
             } catch (e: Exception) {
                 Log.e("UserViewModel", "Error logging in user: ${e.message}", e)
             }
@@ -57,10 +61,24 @@ class UserViewModel @Inject constructor(private val repository: UserRepository) 
         viewModelScope.launch {
             try {
                 repository.logoutUser()
-                _user.value = null // сбрасываем данные пользователя
+                _user.value = null
                 Log.d("UserViewModel", "User logged out successfully")
             } catch (e: Exception) {
                 Log.e("UserViewModel", "Error logging out user: ${e.message}", e)
+            }
+        }
+    }
+
+    fun clearUserIfNotRemembered() {
+        viewModelScope.launch {
+            try {
+                val shouldDelete = repository.shouldDeleteUserOnExit()
+                if (shouldDelete) {
+                    repository.clearUserData()
+                    Log.d("UserViewModel", "User data cleared on app exit")
+                }
+            } catch (e: Exception) {
+                Log.e("UserViewModel", "Error clearing user data on exit: ${e.message}", e)
             }
         }
     }

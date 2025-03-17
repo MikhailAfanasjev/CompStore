@@ -17,6 +17,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.compstore.ui.theme.AccentOrange
+import com.example.compstore.ui.theme.PrimaryText
 
 @Composable
 fun MenuItemProduct(
@@ -31,7 +33,6 @@ fun MenuItemProduct(
             .fillMaxWidth()
             .padding(16.dp)
     ) {
-        // Изображение можно сделать кликабельным для перехода к деталям
         imageResId?.let {
             Image(
                 painter = painterResource(id = it),
@@ -44,7 +45,6 @@ fun MenuItemProduct(
         }
         Spacer(modifier = Modifier.width(16.dp))
 
-        // Остальную часть оборачиваем в отдельный кликабельный блок для показа деталей
         Column(
             modifier = Modifier
                 .weight(1f)
@@ -56,7 +56,7 @@ fun MenuItemProduct(
             ) {
                 Text(
                     text = name,
-                    style = MaterialTheme.typography.titleMedium,
+                    style = MaterialTheme.typography.titleMedium.copy(color = PrimaryText),
                     maxLines = 3,
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.weight(1f)
@@ -66,20 +66,18 @@ fun MenuItemProduct(
                     text = price,
                     style = MaterialTheme.typography.bodyMedium.copy(
                         fontWeight = FontWeight.Bold,
-                        fontSize = 18.sp
+                        fontSize = 16.sp
                     ),
-                    color = MaterialTheme.colorScheme.secondary,
+                    color = AccentOrange,
                     textAlign = TextAlign.End
                 )
             }
             Spacer(modifier = Modifier.height(8.dp))
-            // Кнопка для добавления в корзину остаётся вне внешнего клика
-            Button(
+            CustomButton(
+                text = "Добавить в корзину",
                 onClick = onAddToCartClick,
                 modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(text = "Добавить в корзину")
-            }
+            )
         }
     }
 }

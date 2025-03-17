@@ -1,5 +1,6 @@
 package com.example.compstore.bar
 
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
@@ -18,10 +19,8 @@ import androidx.navigation.NavController
 
 @Composable
 fun ButtonBar(navController: NavController) {
-
-    NavigationBar {
+    NavigationBar(modifier = Modifier.height(56.dp)) {
         NavigationBarItem(
-            label = { Text("Home") },
             icon = {
                 Icon(
                     Icons.Default.Home,
@@ -35,7 +34,6 @@ fun ButtonBar(navController: NavController) {
         )
 
         NavigationBarItem(
-            label = { Text("Basket") },
             icon = {
                 Icon(
                     Icons.Default.ShoppingCart,
@@ -48,7 +46,6 @@ fun ButtonBar(navController: NavController) {
             onClick = { navController.navigate("basket") }
         )
         NavigationBarItem(
-            label = { Text("Chat") },
             icon = {
                 Icon(
                     Icons.Default.Email,
@@ -61,11 +58,10 @@ fun ButtonBar(navController: NavController) {
             onClick = { navController.navigate("chat") }
         )
         NavigationBarItem(
-            label = { Text("Settings") },
             icon = {
                 Icon(
                     Icons.Default.Settings,
-                    contentDescription = "Settengs",
+                    contentDescription = "Settings",
                     tint = Color.Black,
                     modifier = Modifier.size(48.dp)
                 )

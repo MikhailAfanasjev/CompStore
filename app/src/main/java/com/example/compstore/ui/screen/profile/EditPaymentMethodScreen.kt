@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
+import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -24,22 +25,30 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.example.compstore.ui.components.CustomButton
+import com.example.compstore.ui.theme.AccentOrange
+import com.example.compstore.ui.theme.BackgroundLightGrey
+import com.example.compstore.ui.theme.PrimaryText
+import com.example.compstore.utils.scaleDimension
 import com.example.compstore.viewmodel.UserViewModel
 
 @Composable
-fun EditPaymentMethodScreen(navController: NavController, userViewModel: UserViewModel = hiltViewModel()) {
+fun EditPaymentMethodScreen(
+    navController: NavController,
+    userViewModel: UserViewModel = hiltViewModel()
+) {
     var selectedPaymentMethod by remember { mutableStateOf("") }
 
     Surface(
         modifier = Modifier.fillMaxSize(),
-        color = MaterialTheme.colorScheme.background
+        color = BackgroundLightGrey
     ) {
         Column(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.Start,
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp)
+                .padding(scaleDimension(16.dp))
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 RadioButton(
@@ -47,36 +56,52 @@ fun EditPaymentMethodScreen(navController: NavController, userViewModel: UserVie
                     onClick = {
                         selectedPaymentMethod = "Оплата наличными"
                         Log.d("EditPaymentMethod", "Selected: $selectedPaymentMethod")
-                    }
+                    },
+                    colors = RadioButtonDefaults.colors(selectedColor = AccentOrange)
                 )
-                Text(text = "Оплата наличными", modifier = Modifier.padding(start = 8.dp))
+                Text(
+                    text = "Оплата наличными",
+                    modifier = Modifier.padding(start = scaleDimension(8.dp)),
+                    color = PrimaryText
+                )
             }
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(scaleDimension(8.dp)))
             Row(verticalAlignment = Alignment.CenterVertically) {
                 RadioButton(
                     selected = selectedPaymentMethod == "Оплата картой",
                     onClick = {
                         selectedPaymentMethod = "Оплата картой"
                         Log.d("EditPaymentMethod", "Selected: $selectedPaymentMethod")
-                    }
+                    },
+                    colors = RadioButtonDefaults.colors(selectedColor = AccentOrange)
                 )
-                Text(text = "Оплата картой", modifier = Modifier.padding(start = 8.dp))
+                Text(
+                    text = "Оплата картой",
+                    modifier = Modifier.padding(start = scaleDimension(8.dp)),
+                    color = PrimaryText
+                )
             }
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(scaleDimension(8.dp)))
             Row(verticalAlignment = Alignment.CenterVertically) {
                 RadioButton(
                     selected = selectedPaymentMethod == "Оплата переводом",
                     onClick = {
                         selectedPaymentMethod = "Оплата переводом"
                         Log.d("EditPaymentMethod", "Selected: $selectedPaymentMethod")
-                    }
+                    },
+                    colors = RadioButtonDefaults.colors(selectedColor = AccentOrange)
                 )
-                Text(text = "Оплата переводом", modifier = Modifier.padding(start = 8.dp))
+                Text(
+                    text = "Оплата переводом",
+                    modifier = Modifier.padding(start = scaleDimension(8.dp)),
+                    color = PrimaryText
+                )
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(scaleDimension(16.dp)))
 
-            Button(
+            CustomButton(
+                text = "Сохранить",
                 onClick = {
                     if (selectedPaymentMethod.isNotEmpty()) {
                         Log.d("EditPaymentMethod", "Saving payment method: $selectedPaymentMethod")
@@ -87,9 +112,7 @@ fun EditPaymentMethodScreen(navController: NavController, userViewModel: UserVie
                     }
                 },
                 modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Сохранить")
-            }
+            )
         }
     }
 }

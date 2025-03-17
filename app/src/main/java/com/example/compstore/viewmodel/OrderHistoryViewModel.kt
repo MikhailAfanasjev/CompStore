@@ -33,7 +33,6 @@ class OrderHistoryViewModel @Inject constructor(
     private val _userId = MutableStateFlow<Int?>(null)
     val userId: StateFlow<Int?> get() = _userId
 
-    // Поток заказов пользователя (сбор данных начинается сразу)
     val orders: StateFlow<List<Order>> = _userId
         .filterNotNull()
         .flatMapLatest { userId ->
@@ -42,7 +41,6 @@ class OrderHistoryViewModel @Inject constructor(
         }
         .stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
-    // Поток элементов корзины пользователя (сбор данных начинается сразу)
     val cartItems: StateFlow<List<CartItem>> = _userId
         .filterNotNull()
         .flatMapLatest { userId ->
@@ -64,54 +62,48 @@ class OrderHistoryViewModel @Inject constructor(
         }
     }
 
-    fun completePurchase(allProducts: List<Product>) {
+    fun completePurchase(allProducts: List<Product>, selectedProductIds: List<Int>? = null) {
         val currentUserId = _userId.value
         if (currentUserId != null) {
             viewModelScope.launch {
-                Log.d("OrderHistoryViewModel", "Начало оформления покупки для пользователя с id: $currentUserId")
-
-// Собираем корзину для авторизованного пользователя
+                // Собираем корзину
                 val basketItems = cartItems.value.mapNotNull { cartItem ->
                     val product = allProducts.find { it.productId == cartItem.productId }
-                    if (product == null) {
-                        Log.w("OrderHistoryViewModel", "Продукт с id ${cartItem.productId} не найден в allProducts")
-                    }
                     product?.let { it to cartItem.quantity }
                 }
 
-                if (basketItems.isEmpty()) {
-                    Log.w("OrderHistoryViewModel", "Корзина пуста для пользователя с id: $currentUserId")
-                    return@launch
+                // Фильтруем только выбранные товары, если они заданы
+                val filteredBasketItems = if (!selectedProductIds.isNullOrEmpty()) {
+                    basketItems.filter { (product, _) -> product.productId in selectedProductIds }
                 } else {
-                    Log.d("OrderHistoryViewModel", "Найдено ${basketItems.size} элементов в корзине для пользователя с id: $currentUserId")
+                    basketItems
                 }
 
-// Вычисляем итоговую сумму заказа
-                val totalSum = basketItems.sumOf { (product, quantity) ->
+                if (filteredBasketItems.isEmpty()) {
+                    Log.w("OrderHistoryViewModel", "Нет выбранных товаров для оформления заказа")
+                    return@launch
+                }
+
+                // Вычисляем итоговую сумму заказа
+                val totalSum = filteredBasketItems.sumOf { (product, quantity) ->
                     product.price.filter { it.isDigit() }.toInt() * quantity
                 }
-                Log.d("OrderHistoryViewModel", "Итоговая сумма заказа: $totalSum")
-
-// Получаем текущее время оформления заказа
                 val currentTime = SimpleDateFormat("HH:mm dd.MM.yyyy", Locale.getDefault()).format(Date())
-                Log.d("OrderHistoryViewModel", "Время оформления заказа: $currentTime")
 
-// Формируем объект заказа с сохранением списка productIds
                 val order = Order(
                     userId = currentUserId,
                     orderTime = currentTime,
                     totalPrice = "$totalSum ₽",
-                    productIds = basketItems.map { it.first.productId }
+                    productIds = filteredBasketItems.map { it.first.productId }
                 )
                 Log.d("OrderHistoryViewModel", "Создан заказ: $order")
 
-// Сохраняем заказ в базу данных
                 orderRepository.insertOrder(order)
                 Log.d("OrderHistoryViewModel", "Заказ успешно сохранён в базе данных")
 
-// Очищаем корзину для текущего пользователя
-                cartItemRepository.clearCartByUserId(currentUserId)
-                Log.d("OrderHistoryViewModel", "Корзина для пользователя с id: $currentUserId очищена")
+                // Удаляем из корзины только купленные товары
+                cartItemRepository.removeCartItems(currentUserId, selectedProductIds ?: emptyList())
+                Log.d("OrderHistoryViewModel", "Удалены купленные товары из корзины пользователя с id: $currentUserId")
             }
         } else {
             Log.w("OrderHistoryViewModel", "Пользователь не авторизован. Оформление заказа невозможно.")
